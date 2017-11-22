@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_samples_title"
+        android:key="pref_key_storage_settings">
+    <EditTextPreference
+        android:id="@+id/etPrefSamples"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:defaultValue="50"
+        android:key="pref_samples"
+        android:inputType="number"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="Enter the maximum number of samples to store in memory"
+        android:title="Maximum Sample Size" />
+    <EditTextPreference
+        android:id="@+id/etPrefAverage"
+        android:defaultValue="5"
+        android:key="pref_average"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:inputType="number"
+        android:title="Average Calculation Sample Size"
+        android:summary="Enter the number of samples used to calculate average" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_calibration_title"
+        android:key="pref_key_storage_settings">
+    <EditTextPreference
+        android:id="@+id/etPref_Cal_pH7"
+        android:defaultValue="280"
+        android:key="pref_cal_ph7"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:inputType="number|numberDecimal|numberSigned"
+        android:title="pH Calculation Calibration Voltage (Ecal)"
+        android:summary="Enter the voltage (in mV) corresponding to a pH level of 7.0. Used for correctly converting voltage to pH" />
+    <Preference android:title="Reset Ecal Voltage"
+        android:key="reset_ecal"
+        android:summary="Resets pH calculation calibration to default value"/>
+    </PreferenceCategory>
+</PreferenceScreen>

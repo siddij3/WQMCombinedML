@@ -1,0 +1,65 @@
+<resources>
+
+    <!-- Device Scan Activity -->
+    <string name="title_devices">Sensor Device Scan</string>
+    <string name="ble_not_supported">Error: BLE is not supported on this device</string>
+    <string name="label_device_address">Device address:</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="error_bluetooth_not_supported">Error: Bluetooth not supported on this device</string>
+    <string name="unknown_device">Unknown device</string>
+
+    <!-- Menu items -->
+    <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+    <string name="menu_start_rec">Start Recording</string>
+    <string name="menu_stop_rec">Stop Recording</string>
+    <string name="menu_clear">Clear Data</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_export_local">Export to Device (Local)</string>
+    <string name="menu_export_cloud">Export to Drive (Cloud)</string>
+    <string name="menu_change_view_meas">Measurement View</string>
+    <string name="menu_change_view_cal">Calibration View</string>
+
+    <string name="blank"> </string>
+
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_service">Unknown service</string>
+
+    <string name="app_name">Water Quality Monitor</string>
+
+    <string name="lbl_Samples">Samples Collected:</string>
+
+    <string name="lbl_temp">Temp. (&#176;C)</string>
+    <string name="lbl_ph">Ph Level</string>
+    <string name="lbl_chlorine">Free Cl (ppm)</string>
+    <string name="lbl_current">Current:</string>
+    <string name="lbl_average">Average:</string>
+    <string name="no_val">-</string>
+
+    <string name="lbl_tempRaw">Temp. (&#176;C)</string>
+    <string name="lbl_phRaw">  Ph (mV)  </string>
+    <string name="lbl_chlorineRaw">Free Cl (nA)</string>
+    <string name="lbl_rawVal">Raw Values:</string>
+    <string name="lbl_averageph">Average pH:</string>
+    <string name="lbl_mV">mV</string>
+    <string name="lbl_pkpk">pH pk-pk (mV)</string>
+    <string name="lbl_slope">pH slope (mV)</string>
+
+    <string name="btn_start">Start Read</string>
+
+    <string name="btn_cal">Calibrate pH7</string>
+
+    <string name="lbl_AvgSize">Average Size:</string>
+    <string name="lbl_SampSize">Sample Size:</string>
+    <string name="lbl_Ecal">pH7 Ecal (mV):</string>
+
+    <string name="pref_samples_title">Sampling</string>
+    <string name="pref_calibration_title">Calibration</string>
+
+    <string name="file_created">File created: %s</string>
+    <string name="file_create_error">Error: unable to create file</string>
+
+</resources>
