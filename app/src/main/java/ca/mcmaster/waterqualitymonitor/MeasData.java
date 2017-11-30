@@ -32,6 +32,8 @@ class MeasData {
     private double rawT, rawE, rawI; //Raw values for temperature, voltage (pH), current (Cl)
     private String timeStamp; //time stamp for recorded measurement
 
+    private boolean avgOk;
+    private double pH_stats[];
     MeasData(double rawT, double rawE, double rawI, double eCal){
         this.rawT = rawT;
         this.rawE = rawE;
@@ -42,10 +44,26 @@ class MeasData {
         phValue = calcPh(rawE, temperature);
         chlorineValue = calcCl(rawI, phValue, temperature);
 
-        //timeStamp = DateFormat.getDateTimeInstance().format(new Date());
         timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.CANADA).format(new Date());
 
+        //pH Calibration stats
+        avgOk = false;
+        pH_stats = new double[5];
+    }
 
+    public void setpHstats(double[] stats){
+        if (stats.length==pH_stats.length) {
+            pH_stats = stats.clone();
+            avgOk = true;
+        }
+    }
+
+    public double[] getpH_stats(){
+        return pH_stats;
+    }
+
+    public boolean getAvgOk(){
+        return avgOk;
     }
 
     //pH calculation from supplied potential and temperature

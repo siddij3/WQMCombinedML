@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/pref_samples_title"
-        android:key="pref_key_storage_settings">
+        android:title="@string/pref_samples_title">
+
     <EditTextPreference
         android:id="@+id/etPrefSamples"
         android:layout_width="wrap_content"
@@ -12,7 +12,7 @@
         android:inputType="number"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:summary="Enter the maximum number of samples to store in memory"
+        android:summary="@string/pref_samples_desc"
         android:title="Maximum Sample Size" />
     <EditTextPreference
         android:id="@+id/etPrefAverage"
@@ -22,12 +22,12 @@
         android:singleLine="true"
         android:inputType="number"
         android:title="Average Calculation Sample Size"
-        android:summary="Enter the number of samples used to calculate average" />
+        android:summary="@string/pref_avg_samples_desc" />
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_calibration_title"
-        android:key="pref_key_storage_settings">
+        android:title="@string/pref_calibration_title">
+
     <EditTextPreference
         android:id="@+id/etPref_Cal_pH7"
         android:defaultValue="280"
@@ -40,5 +40,18 @@
     <Preference android:title="Reset Ecal Voltage"
         android:key="reset_ecal"
         android:summary="Resets pH calculation calibration to default value"/>
+
+
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_display_title">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:id="@+id/swCalDisplay"
+            android:key="pref_displayAdvCal"
+            android:title="Show advanced calibration display"
+            android:summary="Displays additional information and statistics in the calibration view"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

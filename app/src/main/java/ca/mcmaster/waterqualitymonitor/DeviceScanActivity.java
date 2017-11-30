@@ -188,7 +188,7 @@ public class DeviceScanActivity extends AppCompatActivity {
 
         //todo debug button
         btnDbg = (Button) findViewById(R.id.btnDebug);
-        btnDbg.setVisibility(View.GONE);
+        //btnDbg.setVisibility(View.GONE);
         btnDbg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

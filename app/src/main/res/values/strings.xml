@@ -33,20 +33,27 @@
     <string name="lbl_Samples">Samples Collected:</string>
 
     <string name="lbl_temp">Temp. (&#176;C)</string>
-    <string name="lbl_ph">Ph Level</string>
+    <string name="lbl_ph">pH Level</string>
     <string name="lbl_chlorine">Free Cl (ppm)</string>
     <string name="lbl_current">Current:</string>
     <string name="lbl_average">Average:</string>
     <string name="no_val">-</string>
 
-    <string name="lbl_tempRaw">Temp. (&#176;C)</string>
-    <string name="lbl_phRaw">  Ph (mV)  </string>
-    <string name="lbl_chlorineRaw">Free Cl (nA)</string>
+    <string name="lbl_tempRaw">Temp.(&#176;C)</string>
+    <string name="lbl_phRaw">pH (mV)</string>
+    <string name="lbl_chlorineRaw">Free Cl(nA)</string>
     <string name="lbl_rawVal">Raw Values:</string>
-    <string name="lbl_averageph">Average pH:</string>
+    <string name="lbl_averageph">Average pH (mV)</string>
     <string name="lbl_mV">mV</string>
-    <string name="lbl_pkpk">pH pk-pk (mV)</string>
-    <string name="lbl_slope">pH slope (mV)</string>
+
+    <string name="lbl_averageph_Adv">Avg. pH</string>
+    <string name="lbl_pHStats">pH Statistics:</string>
+    <string name="lbl_pkpk">pk-pk(mV)</string>
+    <string name="lbl_slope">slope<sub><small>LR</small></sub>(mV)</string>
+    <string name="lbl_r2">R<small><sup>2</sup><sub>LR</sub></small></string>
+    <string name="lbl_stdDev">Std. Dev.</string>
+    <string name="lbl_score">Score %</string>
+    <string name="lbl_scoreLarge">Voltage Steady Score %</string>
 
     <string name="btn_start">Start Read</string>
 
@@ -58,6 +65,10 @@
 
     <string name="pref_samples_title">Sampling</string>
     <string name="pref_calibration_title">Calibration</string>
+    <string name="pref_display_title">Display</string>
+
+    <string name="pref_samples_desc">Enter the maximum number of samples to store in memory. Valid range: 5 \u2264 N<sub>S,tot</sub> \u2264 10000</string>
+    <string name="pref_avg_samples_desc">Enter the total number of samples used to calculate average. Valid range: 5 \u2264 N<sub>S,ave</sub> \u2264 500,  &amp; N<sub>S,ave</sub> \u2264 N<sub>S,tot</sub>  </string>
 
     <string name="file_created">File created: %s</string>
     <string name="file_create_error">Error: unable to create file</string>

@@ -11,8 +11,6 @@
         android:id="@+id/layoutPrefs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="0dp"
         android:layout_marginTop="4dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -107,443 +105,679 @@
             app:layout_constraintTop_toTopOf="parent" />
     </GridLayout>
 
-    <!-- Measurement Layout -->
-    <LinearLayout
+    <ScrollView
         android:id="@+id/layoutMeas"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="2dp"
-        android:orientation="vertical"
         android:visibility="visible"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="2dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutPrefs">
+        <!-- Measurement Layout -->
+        <LinearLayout
 
-        <GridLayout
-            android:id="@+id/gridLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="parent"
 
-            app:layout_constraintHorizontal_bias="0.0">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/lblAverage"
+            <GridLayout
+                android:id="@+id/gridLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
-                android:layout_row="2"
-                android:padding="5dp"
-                android:text="@string/lbl_average"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
 
-            <TextView
-                android:id="@+id/lblCurrent"
+                app:layout_constraintTop_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblAverage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="2"
+                    android:padding="5dp"
+                    android:text="@string/lbl_average"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/lblCurrent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="1"
+                    android:padding="5dp"
+                    android:text="@string/lbl_current"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/lblTemperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_row="0"
+                    android:padding="5dp"
+                    android:text="@string/lbl_temp"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/lblPh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_row="0"
+                    android:padding="5dp"
+                    android:text="@string/lbl_ph"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/lblChlorine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="3"
+                    android:layout_row="0"
+                    android:padding="5dp"
+                    android:text="@string/lbl_chlorine"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_currentPh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="1"
+                    android:padding="5dp"
+                    android:text="@string/no_val"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_avgTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="2"
+                    android:padding="5dp"
+                    android:text="@string/no_val"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_currentTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="1"
+                    android:padding="5dp"
+                    android:text="@string/no_val"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_avgCl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="3"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="2"
+                    android:padding="5dp"
+                    android:text="@string/no_val"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_avgPh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="2"
+                    android:padding="5dp"
+                    android:text="@string/no_val"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_currentCl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="3"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_row="1"
+                    android:padding="5dp"
+                    android:text="@string/no_val"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+            </GridLayout>
+
+            <com.androidplot.xy.XYPlot
+                android:id="@+id/measPlot_T"
+                style="@style/APDefacto.Light"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/lbl_current"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_height="320dp"
 
-            <TextView
-                android:id="@+id/lblTemperature"
+                android:layout_marginStart="0dp"
+
+                android:layout_marginTop="0dp"
+                app:backgroundColor="#FFFFFF"
+                app:borderColor="#FFFFFF"
+                app:borderThickness="0dp"
+                app:domainTitle="Time/Sample"
+                app:graphBackgroundColor="#FFFFFF"
+                app:graphPaddingLeft="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/gridLayout"
+                app:lineLabelRotationBottom="-45"
+                app:lineLabelTextSizeBottom="10sp"
+                app:lineLabelTextSizeLeft="9sp"
+                app:lineLabels="left|bottom"
+                app:rangeTitle="@string/lbl_temp"
+                app:title=""
+                tools:layout_editor_absoluteX="0dp" />
+
+            <com.androidplot.xy.XYPlot
+                android:id="@+id/measPlot_pH"
+                style="@style/APDefacto.Light"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_temp"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_height="320dp"
 
-            <TextView
-                android:id="@+id/lblPh"
+                android:layout_marginStart="0dp"
+
+                android:layout_marginTop="0dp"
+                app:backgroundColor="#FFFFFF"
+                app:borderColor="#FFFFFF"
+                app:borderThickness="0dp"
+                app:domainTitle="Time/Sample"
+                app:graphBackgroundColor="#FFFFFF"
+                app:graphPaddingLeft="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/gridLayout"
+                app:lineLabelRotationBottom="-45"
+                app:lineLabelTextSizeBottom="10sp"
+                app:lineLabelTextSizeLeft="9sp"
+                app:lineLabels="left|bottom"
+                app:rangeTitle="@string/lbl_ph"
+                app:title=""/>
+
+            <com.androidplot.xy.XYPlot
+                android:id="@+id/measPlot_Cl"
+                style="@style/APDefacto.Light"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_ph"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_height="320dp"
 
-            <TextView
-                android:id="@+id/lblChlorine"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_chlorine"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_marginStart="0dp"
 
-            <TextView
-                android:id="@+id/val_currentPh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="5dp"
+                app:backgroundColor="#FFFFFF"
+                app:borderColor="#FFFFFF"
+                app:domainTitle="Time/Sample"
+                app:graphBackgroundColor="#FFFFFF"
+                app:graphPaddingLeft="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/gridLayout"
+                app:lineLabelRotationBottom="-45"
+                app:lineLabelTextSizeBottom="10sp"
+                app:lineLabelTextSizeLeft="9sp"
+                app:lineLabels="left|bottom"
+                app:rangeTitle="@string/lbl_chlorine"
+                app:title="" />
 
-            <TextView
-                android:id="@+id/val_avgTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="2"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-            <TextView
-                android:id="@+id/val_currentTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-            <TextView
-                android:id="@+id/val_avgCl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="2"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-            <TextView
-                android:id="@+id/val_avgPh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="2"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-            <TextView
-                android:id="@+id/val_currentCl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-        </GridLayout>
-
-        <com.androidplot.xy.XYPlot
-            android:id="@+id/measPlot"
-            style="@style/APDefacto.Light"
-            android:layout_width="wrap_content"
-            android:layout_height="320dp"
-
-            app:domainTitle="Time/Sample"
-
-            app:lineLabelRotationBottom="-45"
-            app:lineLabels="left|bottom"
-            app:rangeTitle="pH"
-            app:title=""
-            tools:layout_editor_absoluteX="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gridLayout"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="70dp" />
 
 
-    </LinearLayout>
-
+        </LinearLayout>
+    </ScrollView>
     <!-- Calibration Layout -->
     <LinearLayout
         android:id="@+id/layoutCal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-
-        android:layout_marginTop="2dp"
         android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutPrefs">
 
-
-        <GridLayout
-            android:id="@+id/layoutRawVal"
+        <!-- Advanced Calibration Layout -->
+        <LinearLayout
+            android:id="@+id/layoutAdvCal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintHorizontal_bias="1.0"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical"
+            android:visibility="visible"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="parent"
-            tools:ignore="RtlHardcoded">
+            app:layout_constraintTop_toBottomOf="@+id/layoutPrefs">
+
+            <GridLayout
+                android:id="@+id/layoutCalVals"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="2dp"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"
+                tools:ignore="RtlHardcoded">
+
+                <!-- Row 0 -->
+                <TextView
+                    android:id="@+id/lblTemperatureRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:padding="2dp"
+                    android:text="@string/lbl_tempRaw"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/val_TempRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblPhRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:padding="2dp"
+                    android:text="@string/lbl_phRaw"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/val_PhRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="3"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblClRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:padding="2dp"
+                    android:text="@string/lbl_chlorineRaw"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/val_ClRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="5"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
+                <!-- Row 1 -->
+                <TextView
+                    android:id="@+id/lblavgpH_Adv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:padding="2dp"
+                    android:text="@string/lbl_averageph_Adv"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/val_avgPhRaw_Adv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblmV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:padding="2dp"
+                    android:text="@string/lbl_mV"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textStyle="bold" />
+
+
+            </GridLayout>
 
             <TextView
-                android:id="@+id/lblRawVal"
-                android:layout_width="wrap_content"
+                android:id="@+id/lblStats"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/lbl_rawVal"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_gravity="top"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="2dp"
+                android:padding="2dp"
+                android:text="@string/lbl_pHStats"
+                android:textAppearance="@android:style/TextAppearance.Material.Small"
+                android:textStyle="italic" />
 
-            <TextView
-                android:id="@+id/lblTemperatureRaw"
+            <GridLayout
+                android:id="@+id/layoutStats1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_tempRaw"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                app:layout_constraintHorizontal_bias="1.0">
 
-            <TextView
-                android:id="@+id/lblPhRaw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_phRaw"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <!-- Row 0 -->
+                <TextView
+                    android:id="@+id/lblPkPk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:padding="2dp"
+                    android:text="@string/lbl_pkpk"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/lblClRaw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_chlorineRaw"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <TextView
+                    android:id="@+id/val_PkPk"
+                    android:layout_column="1"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/val_PhRaw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <TextView
+                    android:id="@+id/lblSlope"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:padding="2dp"
+                    android:text="@string/lbl_slope"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
 
-            <TextView
-                android:id="@+id/val_ClRaw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <TextView
+                    android:id="@+id/val_slope"
+                    android:layout_column="3"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/val_avgPhRaw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="3"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <TextView
+                    android:id="@+id/lblR2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="0"
+                    android:padding="2dp"
+                    android:text="@string/lbl_r2"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
 
+                <TextView
+                    android:id="@+id/val_r2"
+                    android:layout_column="5"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="5dp"
+                    android:layout_row="0"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+                <!--        </GridLayout>
 
-            <TextView
-                android:id="@+id/lblmV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="3"
-                android:padding="5dp"
-                android:text="@string/lbl_mV"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <GridLayout
+                    android:id="@+id/layoutStats2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    app:layout_constraintHorizontal_bias="1.0">-->
 
-            <TextView
-                android:id="@+id/val_TempRaw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="1"
-                android:padding="5dp"
-                android:text="@string/no_val"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                <!-- Row 1 -->
+                <TextView
+                    android:id="@+id/lblStdDev"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:padding="2dp"
+                    android:text="@string/lbl_stdDev"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textSize="12sp" />
 
+                <TextView
+                    android:id="@+id/val_StdDev"
+                    android:layout_column="1"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:padding="2dp"
+                    android:text="@string/lbl_score"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:layout_editor_absoluteX="41dp"
+                    tools:layout_editor_absoluteY="141dp" />
+
+                <TextView
+                    android:id="@+id/val_scoreAdv"
+                    android:layout_column="3"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
+            </GridLayout>
+
+        </LinearLayout>
+
+        <!-- Standard / Basic Calibration Layout -->
+        <GridLayout
+            android:id="@+id/layoutStdCal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Row 0 -->
             <TextView
                 android:id="@+id/lblavgpH"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_row="3"
-                android:padding="5dp"
+                android:layout_gravity="top|center"
+                android:layout_row="0"
+                android:padding="10dp"
                 android:text="@string/lbl_averageph"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-        </GridLayout>
-
-        <GridLayout
-            android:id="@+id/layoutStats"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintHorizontal_bias="1.0">
+                android:textStyle="italic" />
 
             <TextView
-                android:id="@+id/lblPkPk"
+                android:id="@+id/lblScoreLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_gravity="top|center"
+                android:layout_row="0"
+                android:padding="10dp"
+                android:text="@string/lbl_scoreLarge"
+                android:textStyle="italic" />
+
+            <!-- Row 1 -->
+            <TextView
+                android:id="@+id/val_avgPhRaw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_pkpk"
-                android:textAppearance="@android:style/TextAppearance.Material.Small"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-            <TextView
-                android:id="@+id/val_PkPk"
-                android:layout_width="64dp"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_gravity="center"
-                android:layout_row="0"
-                android:padding="5dp"
+                android:layout_gravity="top|center"
+                android:layout_marginBottom="4dp"
+                android:layout_row="1"
+                android:minWidth="80dp"
+                android:padding="10dp"
                 android:text="@string/no_val"
                 android:textAlignment="center"
-                android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:textSize="36sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/lblSlope"
+                android:id="@+id/val_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_row="0"
-                android:padding="5dp"
-                android:text="@string/lbl_slope"
-                android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:visibility="invisible"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
-
-            <TextView
-                android:id="@+id/val_slope"
-                android:layout_width="64dp"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_gravity="center"
-                android:layout_row="0"
-                android:padding="5dp"
+                android:layout_column="1"
+                android:layout_gravity="top|center"
+                android:layout_marginBottom="4dp"
+                android:layout_row="1"
+                android:minWidth="80dp"
+                android:padding="10dp"
                 android:text="@string/no_val"
                 android:textAlignment="center"
-                android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textStyle="bold"
-                android:visibility="invisible"
-                tools:layout_editor_absoluteX="41dp"
-                tools:layout_editor_absoluteY="141dp" />
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:textSize="36sp"
+                android:textStyle="bold" />
 
         </GridLayout>
 
@@ -552,10 +786,16 @@
             style="@style/APDefacto.Light"
             android:layout_width="wrap_content"
             android:layout_height="256dp"
+            app:backgroundColor="#FFFFFF"
+            app:borderColor="#FFFFFF"
             app:domainTitle="Time/Sample"
+            app:graphBackgroundColor="#FFFFFF"
+            app:graphPaddingLeft="8dp"
             app:lineLabelRotationBottom="-45"
+            app:lineLabelTextSizeBottom="10sp"
+            app:lineLabelTextSizeLeft="9sp"
             app:lineLabels="left|bottom"
-            app:rangeTitle="mV"
+            app:rangeTitle="@string/lbl_phRaw"
             app:title="" />
 
         <Button
@@ -563,7 +803,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="0dp"
             android:layout_marginTop="4dp"
 
             android:elevation="1dp"

@@ -68,33 +68,30 @@ public class Prefs extends AppCompatActivity {
         //Max Samples
         try {
             samples = Integer.parseInt(sp.getString("pref_samples",null));
-            //Check range
-            if (samples < 1){
-                //sp.edit().putString("pref_samples","1").apply();
-                samples = 1;
+            //Check range, should be between 5-10000
+            if (samples < 5){
+                samples = 5;
             }
-            if (samples > 1000){
-                //sp.edit().putString("pref_samples","1000").apply();
-                samples = 1000;
+            if (samples > 10000){
+                samples = 10000;
             }
         } catch (NumberFormatException e){
-            //sp.edit().putString("pref_samples",DEF_SAMPLES).apply();
             samples = Integer.parseInt(DEF_SAMPLES);
         }
         //Average
         try {
             average = Integer.parseInt(sp.getString("pref_average",null));
-            //Check range
-            if (average < 1){
-                //sp.edit().putString("pref_average","1").apply();
-                average = 1;
+            //Check range, should be between 5-500 and less or equal than total samples
+            if (average < 5){
+                average = 5;
             }
             if (average > samples){
-                //sp.edit().putString("pref_average",String.valueOf(samples)).apply();
                 average = samples;
             }
+            if (average > 500){
+                average = 500;
+            }
         } catch (NumberFormatException e){
-            //sp.edit().putString("pref_average",DEF_AVERAGE).apply();
             average = Integer.parseInt(DEF_AVERAGE);
 
         }
