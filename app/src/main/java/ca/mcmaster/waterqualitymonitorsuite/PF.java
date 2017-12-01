@@ -1,4 +1,4 @@
-package ca.mcmaster.waterqualitymonitor;
+package ca.mcmaster.waterqualitymonitorsuite;
 
 import android.os.Bundle;
 import android.preference.EditTextPreference;

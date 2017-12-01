@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/WaterQualityMonitor.iml" filepath="$PROJECT_DIR$/WaterQualityMonitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WaterQualityMonitorCombined.iml" filepath="$PROJECT_DIR$/WaterQualityMonitorCombined.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

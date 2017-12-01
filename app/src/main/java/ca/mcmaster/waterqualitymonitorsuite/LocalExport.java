@@ -1,13 +1,7 @@
-package ca.mcmaster.waterqualitymonitor;
+package ca.mcmaster.waterqualitymonitorsuite;
 
-import android.content.IntentSender;
 import android.os.Environment;
-import android.support.v4.app.NotificationCompatSideChannelService;
 import android.util.Log;
-
-import com.google.android.gms.drive.CreateFileActivityOptions;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveResourceClient;
 
 import java.io.File;
 import java.io.FileOutputStream;

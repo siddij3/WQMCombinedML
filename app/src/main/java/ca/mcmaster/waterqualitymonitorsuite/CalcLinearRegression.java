@@ -1,4 +1,4 @@
-package ca.mcmaster.waterqualitymonitor;
+package ca.mcmaster.waterqualitymonitorsuite;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;

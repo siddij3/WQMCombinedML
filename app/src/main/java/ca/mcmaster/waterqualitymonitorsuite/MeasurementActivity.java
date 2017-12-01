@@ -1,4 +1,4 @@
-package ca.mcmaster.waterqualitymonitor;
+package ca.mcmaster.waterqualitymonitorsuite;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -153,6 +153,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_measurement);
 
         if (getSupportActionBar()!=null) {
+            getSupportActionBar().setTitle(R.string.title_wqm);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } else {
             Log.e(TAG, "onCreate: Action support bar should not be null");
@@ -518,8 +519,25 @@ public class MeasurementActivity extends AppCompatActivity implements
             }
             measuring = false;
         }
+        setActionBarSubtitle();
     }
 
+    private void setActionBarSubtitle(){
+        if(getSupportActionBar()!=null){
+            if(BLE_Connected){
+                if(measuring)
+                    getSupportActionBar().setSubtitle(getResources().getString(R.string.connected_measuring));
+                else
+                    getSupportActionBar().setSubtitle(getResources().getString(R.string.connected_stopped));
+            } else {
+                getSupportActionBar().setSubtitle(getResources().getString(R.string.disconnected));
+            }
+
+        } else {
+            Log.e(TAG, "setActionBarSubtitle: Should not be null!");
+            finish();
+        }
+    }
     // BLE DEVICE CONTROL
     // Code to manage Service lifecycle.
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -705,15 +723,13 @@ public class MeasurementActivity extends AppCompatActivity implements
         BluetoothDevice bd = bluetoothLeService.getDevice();
         if (connected && bd != null) {
             //msgToast("Connected");
-            getSupportActionBar().setSubtitle("Connected: " + bd.getAddress());
             BLE_Connected = true;
 
         } else {
             //msgToast("Disconnected");
-            getSupportActionBar().setSubtitle(getResources().getString(R.string.disconnected));
             BLE_Connected = false;
         }
-
+        setActionBarSubtitle();
     }
 
     private boolean parseData(StringBuilder sb, double[] data){

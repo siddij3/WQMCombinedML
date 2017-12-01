@@ -1,4 +1,4 @@
-package ca.mcmaster.waterqualitymonitor;
+package ca.mcmaster.waterqualitymonitorsuite;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,36 +10,22 @@ import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.CreateFileActivityOptions;
-import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -51,10 +37,7 @@ import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.OpenFileActivityOptions;
-
-import java.util.ArrayList;
 
 /**
  * Created by DK on 2017-11-09.

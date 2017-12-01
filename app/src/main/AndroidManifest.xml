@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ca.mcmaster.waterqualitymonitor">
+    package="ca.mcmaster.waterqualitymonitorsuite">
 
-
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -19,17 +21,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="ca.mcmaster.waterqualitymonitor.DeviceScanActivity">
+        <activity android:name="ca.mcmaster.testsuitecommon.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="ca.mcmaster.waterqualitymonitor.MeasurementActivity"/>
-        <activity android:name="ca.mcmaster.waterqualitymonitor.Prefs"/>
-        <activity android:name="ca.mcmaster.waterqualitymonitor.DriveExport"/>
-        <service android:name="ca.mcmaster.waterqualitymonitor.BluetoothLeService" android:enabled="true"/>
+        <activity android:name="ca.mcmaster.testsuitecommon.DeviceScanActivity" />
+        <activity android:name=".MeasurementActivity" />
+        <activity android:name=".Prefs" />
+        <activity android:name=".DriveExport" />
+        <activity android:name="ca.mcmaster.potentiostat.ExperimentActivity" />
+
+        <service
+            android:name=".BluetoothLeService"
+            android:enabled="true" />
     </application>
 
 </manifest>

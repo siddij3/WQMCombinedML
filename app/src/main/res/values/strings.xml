@@ -1,19 +1,41 @@
 <resources>
+    <!--******** Application ********-->
+    <string name="app_name">Water Testing Suite</string>
+
+    <!--******** Test Suite Common ********-->
+
+    <!-- Splash Activity -->
+    <string name="title_splash">Sensor Device Scan</string>
+    <string name="btn_launchWQM">Water Quality Monitor\n\nTemperature, pH level, and free Cl measurements</string>
+    <string name="lbl_launch">Select Application to Run:</string>
+    <string name="btn_launchPStat">Potentiostat Electroanalysis\n\nCyclic Voltammetry (CV) and Differential Pulse Voltammetry</string>
 
     <!-- Device Scan Activity -->
     <string name="title_devices">Sensor Device Scan</string>
     <string name="ble_not_supported">Error: BLE is not supported on this device</string>
     <string name="label_device_address">Device address:</string>
-    <string name="connected">Connected</string>
-    <string name="disconnected">Disconnected</string>
+
+
     <string name="error_bluetooth_not_supported">Error: Bluetooth not supported on this device</string>
     <string name="unknown_device">Unknown device</string>
-
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_service">Unknown service</string>
     <!-- Menu items -->
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+
+    <!--******** Potentiostat ********-->
+
+    <string name="title_activity_experiment">Potentiostat</string>
+    <string name="lbl_exp_select">Select Experiment:</string>
+    <string name="btn_edit_selected">Edit Selected Experiment</string>
+    <string name="btn_run_selected">Run Selected Experiment</string>
+    <string name="btn_create_new">Create New Experiment</string>
+
+    <!--******** Water Quality Monitor ********-->
+
     <string name="menu_start_rec">Start Recording</string>
     <string name="menu_stop_rec">Stop Recording</string>
     <string name="menu_clear">Clear Data</string>
@@ -25,11 +47,11 @@
 
     <string name="blank"> </string>
 
-    <string name="unknown_characteristic">Unknown characteristic</string>
-    <string name="unknown_service">Unknown service</string>
 
-    <string name="app_name">Water Quality Monitor</string>
-
+    <string name="title_wqm">Water Quality Monitor</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connected_measuring">Connected: Recording</string>
+    <string name="connected_stopped">Connected: Stopped</string>
     <string name="lbl_Samples">Samples Collected:</string>
 
     <string name="lbl_temp">Temp. (&#176;C)</string>
@@ -72,5 +94,6 @@
 
     <string name="file_created">File created: %s</string>
     <string name="file_create_error">Error: unable to create file</string>
+
 
 </resources>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ca.mcmaster.waterqualitymonitor;
+package ca.mcmaster.testsuitecommon;
 
 import android.Manifest;
 import android.app.Activity;
@@ -51,6 +51,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ca.mcmaster.potentiostat.ExperimentActivity;
+import ca.mcmaster.waterqualitymonitorsuite.MeasurementActivity;
+import ca.mcmaster.waterqualitymonitorsuite.Prefs;
+import ca.mcmaster.waterqualitymonitorsuite.R;
+
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
@@ -62,12 +67,18 @@ public class DeviceScanActivity extends AppCompatActivity {
     private boolean mScanning;
     private Handler mHandler;
 
+    private String selectedApp;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_RESPONSE = 2;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
 
     private static final int REQUEST_ENABLE_LOC = 10;
+
+    //Extras Definitions
+    public static final String EXTRAS_SELECTED_APP = "SELECTED_APP";
+    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
+    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
     private ListView listView;
 
@@ -79,6 +90,9 @@ public class DeviceScanActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.title_devices);
         mHandler = new Handler();
 
+        //Intent and extra data
+        final Intent intent = getIntent();
+        selectedApp = intent.getStringExtra(EXTRAS_SELECTED_APP);
         listView = (ListView) findViewById(R.id.deviceList);
 
         // Prompt for permissions
@@ -111,7 +125,6 @@ public class DeviceScanActivity extends AppCompatActivity {
             }
 
         }
-
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
@@ -162,7 +175,6 @@ public class DeviceScanActivity extends AppCompatActivity {
 
         }
 
-
         // Initializes list view adapter.
         mLeDeviceListAdapter = new LeDeviceListAdapter();
         listView.setAdapter(mLeDeviceListAdapter);
@@ -177,11 +189,25 @@ public class DeviceScanActivity extends AppCompatActivity {
                 final BluetoothDevice device = mLeDeviceListAdapter.getDevice(i);
                 if (device == null) return;
 
-                final Intent intent = new Intent(DeviceScanActivity.this,MeasurementActivity.class);
-                intent.putExtra(MeasurementActivity.EXTRAS_DEVICE_NAME, device.getName());
-                intent.putExtra(MeasurementActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-
-                startActivity(intent);
+                //Start activity based on app selected in splash screen
+                switch (selectedApp) {
+                    case "WQM":
+                        final Intent intentWQM = new Intent(DeviceScanActivity.this,MeasurementActivity.class);
+                        intentWQM.putExtra(EXTRAS_DEVICE_NAME, device.getName());
+                        intentWQM.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                        startActivity(intentWQM);
+                        break;
+                    case "PStat":
+                        final Intent intentPStat = new Intent(DeviceScanActivity.this,ExperimentActivity.class);
+                        intentPStat.putExtra(EXTRAS_DEVICE_NAME, device.getName());
+                        intentPStat.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                        startActivity(intentPStat);
+                        break;
+                    default:
+                        Log.e(TAG, "Error: Selected Application Not Recognized!");
+                        finish();
+                        break;
+                }
 
             }
         });
@@ -195,12 +221,24 @@ public class DeviceScanActivity extends AppCompatActivity {
                 if (mScanning)
                     scanLeDevice(false);
 
-                final Intent intent = new Intent(DeviceScanActivity.this,MeasurementActivity.class);
-                intent.putExtra(MeasurementActivity.EXTRAS_DEVICE_NAME, "TEST");
-                intent.putExtra(MeasurementActivity.EXTRAS_DEVICE_ADDRESS, "TEST_ADD");
-
-                startActivity(intent);
-
+                switch (selectedApp) {
+                    case "WQM":
+                        final Intent intent = new Intent(DeviceScanActivity.this, MeasurementActivity.class);
+                        intent.putExtra(EXTRAS_DEVICE_NAME, "TEST");
+                        intent.putExtra(EXTRAS_DEVICE_ADDRESS, "TEST_ADD");
+                        startActivity(intent);
+                        break;
+                    case "PStat":
+                        final Intent intentPStat = new Intent(DeviceScanActivity.this,ExperimentActivity.class);
+                        intentPStat.putExtra(EXTRAS_DEVICE_NAME, "TEST");
+                        intentPStat.putExtra(EXTRAS_DEVICE_ADDRESS, "TEST_ADD");
+                        startActivity(intentPStat);
+                        break;
+                    default:
+                        Log.e(TAG, "Error: Selected Application Not Recognized!");
+                        finish();
+                        break;
+              }
             }
         });
     }
