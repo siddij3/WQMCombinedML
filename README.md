@@ -1,4 +1,4 @@
-# WaterQualityMonitorCombined
+# Water Quality Monitor App
 
 Installation:
 1. Since we are installing the APK manually, we must allow App installations from unknown sources on the target device:
