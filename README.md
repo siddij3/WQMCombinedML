@@ -5,4 +5,4 @@ Installation:
 
 Go to Menu > Settings > Security > and check Unknown Sources to allow your phone to install apps from sources other than the Google Play Store
 
-2. Download APK File onto device from repository
+2. Download APK File onto device from repository (WaterQualityMonitorCombined/app-release-unsigned.apk)
