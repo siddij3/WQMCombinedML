@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
@@ -50,36 +51,47 @@ import com.androidplot.xy.*;
 
 import java.util.*;
 
+import ca.mcmaster.testsuitecommon.BluetoothLeService;
+import ca.mcmaster.testsuitecommon.DeviceScanActivity;
+import ca.mcmaster.testsuitecommon.GattAttributes;
+
 public class MeasurementActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = MeasurementActivity.class.getSimpleName();
 
-    //Extras Definitions
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
+    private boolean demoMode = false;
 
     private static final int VIEW_MEAS = 0;
     private static final int VIEW_CAL = 1;
-    private static final boolean INCLUDE_STATS = true; // TODO: 2017-11-28 Change to preference?
+    private static final boolean INCLUDE_STATS = false;
 
-    public static final int MAX_READ_LINE_LEN = 32; //Maximum expected size in chars per msg
+    private static final double CL_MEAS_THRESHOLD = 40.0;
+
+    public static final int MAX_READ_LINE_LEN = 50; //Maximum expected size in chars per msg
     private static final String TITLE_HEADER = "Water Quality Monitor Results"; //Exported file header title
 
     //Request Codes
     private static final int REQUEST_CODE_SAVE_TO_DRIVE = 1;
     public final static int REQUEST_CODE_NOTIFY_IF_UPDATED = 2; //Request code for starting Prefs activity
 
+    //Demo Data
+    //pH data in mV
+    private static final double[] DEMO_PH_E = {499.767,494.1002,488.4335,484.8969,481.3604,479.1831,477.0058,475.5385,474.0713,473.2279,472.3846,471.5623,470.74,469.6049,468.4698,467.9539,467.4381,467.0957,466.7533,466.3692,465.9851,465.7744,465.5636,465.3774,465.1912,464.9209,464.6506,464.4131,464.1756,463.9541,463.7327,463.6017,463.4708,463.3505,463.2302,463.1743,463.1185,463.0234,462.9283,462.9125,462.8968,462.8779,462.859,462.8424,462.8257,462.8082,462.7907,462.7723,462.7539,462.7413,462.7287,462.716,462.7033,462.6885,462.6737,462.6591,462.6445,462.6355,462.6266,462.6113,462.6113};
+    //Cl data in nA
+    private static final double[] DEMO_CL_I = {-3218.89,-2281.19,-2218.72,-2156.26,-1906.39,-1728.15,-1653.15,-1584.41,-1528.14,-1471.9,-1443.46,-1402.83,-1365.96,-1333.46,-1303.46,-1274.71,-1248.46,-1224.71,-1202.83,-1179.71,-1159.08,-1139.08,-1120.95,-1105.33,-1089.7,-1074.7,-1060.33,-1046.58,-1032.83,-1020.33,-1008.45,-997.828,-986.577,-975.327,-963.452,-952.202,-944.703,-935.951,-927.827,-919.076,-911.577,-903.451,-895.326,-886.576,-880.326,-873.612,-867.2389,-861.2067,-855.5155,-850.1652,-845.1558,-840.4874,-836.1598,-832.1733,-828.5276,-825.2229,-822.2591,-819.6362,-817.3543,-815.4133,-815.4133};
+
     private int activeView;
     private SharedPreferences sharedPrefs;
 
-    private String deviceName;
-    private String deviceAddress;
-
+    private boolean calpHViewActive;
     private boolean measuring;
     private int readFails;
+
+    private String deviceName;
+    private String deviceAddress;
 
     private BluetoothLeService bluetoothLeService;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> gattCharacteristics =
@@ -95,23 +107,31 @@ public class MeasurementActivity extends AppCompatActivity implements
     CalcLinearRegression calcLR;
 
     //GUI elements
-    private Button btnCal;
+    private Button btnCal_pH7;
+    private Button btnCal_pH4;
+    private Button btnCal_pH10;
+    private Button btnCal_tLo;
+    private Button btnCal_tHi;
     private View viewMeas;
     private View viewCal;
     private View viewCalAdvDisplay;
     private View viewCalStdDisplay;
 
+    private View viewButtons_pH;
+    private View viewButtons_T;
+
     private TextView[] tvCurrentVals = new TextView[6];
-    private TextView[] tvAvgVals = new TextView[5];
+    private TextView[] tvAvgVals = new TextView[7];
     private TextView[] tvStats = new TextView[7];
+
+    private TextView[] tvCalpHLbl = new TextView[3];
+    private TextView[] tvCalTLbl = new TextView[3];
 
     private StringBuilder sbRead = new StringBuilder();
 
-
-
     //Plot Variables
     private XYPlot calPlot;
-    private XYSeries calPlotSeries_pH;
+    private XYSeries calPlotSeries;
 
     private XYPlot measPlot_T;
     private XYPlot measPlot_Cl;
@@ -130,7 +150,8 @@ public class MeasurementActivity extends AppCompatActivity implements
     private LocationRequest mLocationRequest;
 
     //Stored mean voltage and status for calibration
-    double averageCalVoltage;
+    double averageCalVoltage_pH;
+    double averageCalVoltage_t;
     boolean averageCalVoltageValid;
 
     //Preference/Settings display
@@ -143,9 +164,65 @@ public class MeasurementActivity extends AppCompatActivity implements
     private int maxSampleSize;
     private int avgSampleSize;
     private boolean displayAdvCal;
-    private double eCal;
+    private double phCalOffset;
+    private double phCalSlopeLo;
+    private double phCalV4;
+    private double phCalSlopeHi;
+    private double phCalV10;
+    private double tCalV100;
+    private double tCalOffset;
+    private double tCalSlope;
+
+    private double ClCalSlope;
+    private double ClCalOffset;
+    private double ClCalLevel; // free Cl ppm corresponding to Cl Offset value
 
 
+    //Timer functionality, used only for demo mode to simulate samples
+    long startTime = 0;
+
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            long millis = System.currentTimeMillis() - startTime;
+            int seconds = (int) (millis / 1000);
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+
+
+            Random rand = new Random();
+
+            double t, e, i;
+            double m, x, b;
+
+            //generate ramp up, ramp down, and flat section
+            /*if ((seconds >= 0) && (seconds < 15)){
+                m = 1.0;
+                x = seconds - 0;
+                b = 0;
+            } else if ((seconds >= 15) && (seconds < 30)){
+                m = -1.0;
+                x = seconds - 10;
+                b = 15.0;
+            } else {
+                m = 0.0;
+                x = seconds - 20;
+                b = 0;
+            }*/
+
+            t = 436.9 + 0.06*(rand.nextDouble()*2-1);
+            e = DEMO_PH_E[seconds];
+            i = DEMO_CL_I[seconds];
+            //e = -50.0 + 0.02*(m*x+b) + 0.03*(rand.nextDouble()*2-1);
+            //i = 500.0 + 0.04*(m*x+b) + 0.06*(rand.nextDouble()*2-1);
+
+            updateDataSwCl(t, e,  i,(double)seconds, seconds>50);
+            timerHandler.postDelayed(this, 1000);
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,8 +240,8 @@ public class MeasurementActivity extends AppCompatActivity implements
 
         //Intent and extra data
         final Intent intent = getIntent();
-        deviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        deviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+        deviceName = intent.getStringExtra(DeviceScanActivity.EXTRAS_DEVICE_NAME);
+        deviceAddress = intent.getStringExtra(DeviceScanActivity.EXTRAS_DEVICE_ADDRESS);
 
         tvCurrentVals[0] = (TextView) findViewById(R.id.val_currentTemp);
         tvCurrentVals[1] = (TextView) findViewById(R.id.val_currentPh);
@@ -178,6 +255,8 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvAvgVals[2] = (TextView) findViewById(R.id.val_avgCl);
         tvAvgVals[3] = (TextView) findViewById(R.id.val_avgPhRaw_Adv);
         tvAvgVals[4] = (TextView) findViewById(R.id.val_avgPhRaw);
+        tvAvgVals[5] = (TextView) findViewById(R.id.val_avgTRaw_Adv);
+        tvAvgVals[6] = (TextView) findViewById(R.id.val_avgTRaw);
 
 
         tvSamples = (TextView) findViewById(R.id.val_Samples);
@@ -194,19 +273,14 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvStats[5]  = (TextView) findViewById(R.id.val_score);
         tvStats[6]  = (TextView) findViewById(R.id.val_PkPk);
 
-        //Get preferences
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        maxSampleSize = Integer.parseInt(sharedPrefs.getString("pref_samples",Prefs.DEF_SAMPLES));
-        avgSampleSize = Integer.parseInt(sharedPrefs.getString("pref_average",Prefs.DEF_AVERAGE));
-        displayAdvCal = sharedPrefs.getBoolean("pref_displayAdvCal", false);
-        eCal = Double.parseDouble(sharedPrefs.getString("pref_cal_ph7",Prefs.DEF_ECAL));
+        //Set calibration values from stored preferences
+        getValsFromPrefs();
 
         //Update Settings display with values from preferences
         updateSettingsDisplay();
 
         //Class for regression calculations
         calcLR = new CalcLinearRegression(true);
-
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, serviceConnection, BIND_AUTO_CREATE);
@@ -215,8 +289,21 @@ public class MeasurementActivity extends AppCompatActivity implements
         viewCalAdvDisplay = findViewById(R.id.layoutAdvCal);
         viewCalStdDisplay = findViewById(R.id.layoutStdCal);
         viewMeas = findViewById(R.id.layoutMeas);
+
+        //Views for toggling visibility between T and pH calibration
+        tvCalpHLbl[0] = findViewById(R.id.lblStats_pH);
+        tvCalpHLbl[1] = findViewById(R.id.lblavgpH);
+        tvCalpHLbl[2] = findViewById(R.id.lblavgpH_Adv);
+        tvCalTLbl[0] = findViewById(R.id.lblStats_T);
+        tvCalTLbl[1] = findViewById(R.id.lblavgRawT);
+        tvCalTLbl[2] = findViewById(R.id.lblavgRawT_Adv);
+
+        viewButtons_pH = findViewById(R.id.calButtons_pH);
+        viewButtons_T = findViewById(R.id.calButtons_T);
         setView(VIEW_MEAS);
         startMeasuring(true);
+        calpHViewActive = true;
+
         readFails = 0;
 
         //Location Services using google API Client
@@ -229,43 +316,43 @@ public class MeasurementActivity extends AppCompatActivity implements
         //XY Plots
         calPlot = (XYPlot) findViewById(R.id.calPlot);
         calPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
-        calPlotSeries_pH = new SimpleXYSeries("pH voltage (mV)");
-        calPlot.addSeries(calPlotSeries_pH, new LineAndPointFormatter(Color.BLUE, null, null, null));
+        calPlotSeries = new SimpleXYSeries("Cal. voltage (mV)");
+        calPlot.addSeries(calPlotSeries, new LineAndPointFormatter(Color.BLUE, null, null, null));
 
         measPlot_T = (XYPlot) findViewById(R.id.measPlot_T);
         measPlot_T.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
+        measPlot_T.setRangeBoundaries(20, 21.8, BoundaryMode.FIXED );
         measPlotSeries_T = new SimpleXYSeries("Temperature");
         measPlot_T.addSeries(measPlotSeries_T, new LineAndPointFormatter(Color.DKGRAY, null, null, null));
 
         measPlot_pH = (XYPlot) findViewById(R.id.measPlot_pH);
-        measPlot_pH.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.000"));
+        measPlot_pH.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
         measPlotSeries_pH = new SimpleXYSeries("pH Level");
         measPlot_pH.addSeries(measPlotSeries_pH, new LineAndPointFormatter(Color.BLUE, null, null, null));
 
         measPlot_Cl = (XYPlot) findViewById(R.id.measPlot_Cl);
-        measPlot_Cl.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("0.000E0"));
+        measPlot_Cl.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
         measPlotSeries_Cl = new SimpleXYSeries("Free Cl");
         measPlot_Cl.addSeries(measPlotSeries_Cl, new LineAndPointFormatter(Color.GREEN, null, null, null));
 
 
-        //Calibrate button and click listener
-        btnCal = findViewById(R.id.btnCal_pH7);
-        btnCal.setVisibility(View.INVISIBLE);
-        btnCal.setOnClickListener(new View.OnClickListener() {
+        //pH7 calibrate button and click listener
+        btnCal_pH7 = findViewById(R.id.btnCal_pH7);
+        btnCal_pH7.setVisibility(View.INVISIBLE);
+        btnCal_pH7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (averageCalVoltageValid) {
                     new AlertDialog.Builder(MeasurementActivity.this)
                             .setTitle("Update Calibration Voltage")
                             .setMessage("Do you really want to update the calibration voltage for pH = 7 with the current average pH potential?")
-
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     //User clicked ok, reset calibration voltage
                                     if(averageCalVoltageValid) {
-                                        eCal = averageCalVoltage;
-                                        sharedPrefs.edit().putString("pref_cal_ph7",String.valueOf(eCal)).commit();
+                                        phCalOffset = averageCalVoltage_pH;
+                                        sharedPrefs.edit().putString("pref_cal_ph7",String.valueOf(phCalOffset)).apply();
                                     }
                                     updateSettingsDisplay();
                                 }
@@ -275,6 +362,118 @@ public class MeasurementActivity extends AppCompatActivity implements
             }
         });
 
+        //pH4 calibrate button and click listener
+        btnCal_pH4 = findViewById(R.id.btnCal_pH4);
+        btnCal_pH4.setVisibility(View.INVISIBLE);
+        btnCal_pH4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (averageCalVoltageValid) {
+                    new AlertDialog.Builder(MeasurementActivity.this)
+                            .setTitle("Update Calibration Voltage")
+                            .setMessage("Do you really want to update the calibration voltage for pH = 4 with the current average pH potential?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //User clicked ok, reset calibration voltage
+                                    if(averageCalVoltageValid) {
+                                        phCalV4 = averageCalVoltage_pH;
+                                        sharedPrefs.edit().putString(Prefs.PREF_PH4_VAL,String.valueOf(phCalV4)).apply();
+                                        phCalSlopeLo = (phCalOffset - phCalV4) / 3;
+                                        sharedPrefs.edit().putString("pref_cal_phslopelo",String.valueOf(phCalSlopeLo)).apply();
+                                    }
+                                    updateSettingsDisplay();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+            }
+        });
+
+        //pH10 calibrate button and click listener
+        btnCal_pH10 = findViewById(R.id.btnCal_pH10);
+        btnCal_pH10.setVisibility(View.INVISIBLE);
+        btnCal_pH10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (averageCalVoltageValid) {
+                    new AlertDialog.Builder(MeasurementActivity.this)
+                            .setTitle("Update Calibration Voltage")
+                            .setMessage("Do you really want to update the calibration voltage for pH = 10 with the current average pH potential?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //User clicked ok, reset calibration voltage
+                                    if(averageCalVoltageValid) {
+                                        phCalV10 = averageCalVoltage_pH;
+                                        sharedPrefs.edit().putString(Prefs.PREF_PH10_VAL,String.valueOf(phCalV10)).apply();
+                                        phCalSlopeHi = (phCalOffset - phCalV10) / (-3);
+                                        sharedPrefs.edit().putString("pref_cal_phslopehi",String.valueOf(phCalSlopeHi)).apply();
+                                    }
+                                    updateSettingsDisplay();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+            }
+        });
+
+
+        //Temp 0 Calibrate button and click listener
+        btnCal_tLo = findViewById(R.id.btnCal_Tlow);
+        btnCal_tLo.setVisibility(View.INVISIBLE);
+        btnCal_tLo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (averageCalVoltageValid) {
+                    new AlertDialog.Builder(MeasurementActivity.this)
+                            .setTitle("Update Calibration Voltage")
+                            .setMessage("Do you really want to update the calibration voltage for T = 0&#176;C with the current average temperature potential?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //User clicked ok, reset calibration voltage
+                                    if(averageCalVoltageValid) {
+                                        tCalOffset = averageCalVoltage_t;
+                                        sharedPrefs.edit().putString("pref_cal_toffset",String.valueOf(tCalOffset)).apply();
+                                        tCalSlope = (tCalV100 - tCalOffset) / 100;
+                                        sharedPrefs.edit().putString("pref_cal_tslope",String.valueOf(tCalSlope)).apply();
+                                    }
+                                    updateSettingsDisplay();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+            }
+        });
+
+        //Temp 100 Calibrate button and click listener
+        btnCal_tHi = findViewById(R.id.btnCal_Thigh);
+        btnCal_tHi.setVisibility(View.INVISIBLE);
+        btnCal_tHi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (averageCalVoltageValid) {
+                    new AlertDialog.Builder(MeasurementActivity.this)
+                            .setTitle("Update Calibration Voltage")
+                            .setMessage("Do you really want to update the calibration voltage for T = 100&#176;C with the current average temperature potential?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //User clicked ok, reset calibration voltage
+                                    if(averageCalVoltageValid) {
+                                        tCalV100 = averageCalVoltage_t;
+                                        sharedPrefs.edit().putString(Prefs.PREF_T100_VAL,String.valueOf(tCalV100)).apply();
+                                        tCalSlope = (tCalV100 - tCalOffset) / 100;
+                                        sharedPrefs.edit().putString("pref_cal_tslope",String.valueOf(tCalSlope)).apply();
+                                    }
+                                    updateSettingsDisplay();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+            }
+        });
     }
 
 
@@ -296,11 +495,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
-        //Get preferences
-        maxSampleSize = Integer.parseInt(sharedPrefs.getString("pref_samples",Prefs.DEF_SAMPLES));
-        avgSampleSize = Integer.parseInt(sharedPrefs.getString("pref_average",Prefs.DEF_AVERAGE));
-        displayAdvCal = sharedPrefs.getBoolean("pref_displayAdvCal", false);
-        eCal = Double.parseDouble(sharedPrefs.getString("pref_cal_ph7",Prefs.DEF_ECAL));
+        getValsFromPrefs();
 
         setCalView();
         updateSettingsDisplay();
@@ -384,16 +579,25 @@ public class MeasurementActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.meas_menu, menu);
         switch (activeView){
             case VIEW_CAL:
-                menu.findItem(R.id.menu_change_view_cal).setVisible(false);
+                if(calpHViewActive){
+                    menu.findItem(R.id.menu_change_view_cal_pH).setVisible(false);
+                    menu.findItem(R.id.menu_change_view_cal_T).setVisible(true);
+                } else {
+                    menu.findItem(R.id.menu_change_view_cal_pH).setVisible(true);
+                    menu.findItem(R.id.menu_change_view_cal_T).setVisible(false);
+                }
+
                 menu.findItem(R.id.menu_change_view_meas).setVisible(true);
                 break;
             case VIEW_MEAS:
-                menu.findItem(R.id.menu_change_view_cal).setVisible(true);
+                menu.findItem(R.id.menu_change_view_cal_pH).setVisible(true);
+                menu.findItem(R.id.menu_change_view_cal_T).setVisible(true);
                 menu.findItem(R.id.menu_change_view_meas).setVisible(false);
                 break;
             // VIEW_MEAS action for default case
             default:
-                menu.findItem(R.id.menu_change_view_cal).setVisible(true);
+                menu.findItem(R.id.menu_change_view_cal_pH).setVisible(true);
+                menu.findItem(R.id.menu_change_view_cal_T).setVisible(true);
                 menu.findItem(R.id.menu_change_view_meas).setVisible(false);
                 activeView = VIEW_MEAS;
                 break;
@@ -450,15 +654,19 @@ public class MeasurementActivity extends AppCompatActivity implements
                 startActivityForResult(intentDrive, REQUEST_CODE_SAVE_TO_DRIVE);
 
                 return true;
-            case R.id.menu_change_view_cal:
+            case R.id.menu_change_view_cal_pH:
+                calpHViewActive = true;
                 setView(VIEW_CAL);
                 invalidateOptionsMenu();
-                showMessage("Calibration View");
                 return true;
             case R.id.menu_change_view_meas:
                 setView(VIEW_MEAS);
                 invalidateOptionsMenu();
-                showMessage("Measurement View");
+                return true;
+            case R.id.menu_change_view_cal_T:
+                calpHViewActive = false;
+                setView(VIEW_CAL);
+                invalidateOptionsMenu();
                 return true;
             case R.id.menu_settings:
                 Intent intentSettings = new Intent(this, Prefs.class);
@@ -467,6 +675,31 @@ public class MeasurementActivity extends AppCompatActivity implements
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void getValsFromPrefs(){
+        double defVal;
+        //Get preferences
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        maxSampleSize = Integer.parseInt(sharedPrefs.getString("pref_samples",Prefs.DEF_SAMPLES));
+        avgSampleSize = Integer.parseInt(sharedPrefs.getString("pref_average",Prefs.DEF_AVERAGE));
+        displayAdvCal = sharedPrefs.getBoolean("pref_displayAdvCal", false);
+
+        phCalOffset = Double.parseDouble(sharedPrefs.getString("pref_cal_ph7",Prefs.DEF_PHCALOFFSET));
+        defVal = Double.valueOf(Prefs.DEF_PHCALOFFSET) + Double.valueOf(Prefs.DEF_PHCALSLOPE) * 3; //default ph10 potential
+        phCalV10 = Double.parseDouble(sharedPrefs.getString(Prefs.PREF_PH10_VAL,String.valueOf(defVal)));
+        defVal = Double.valueOf(Prefs.DEF_PHCALOFFSET) + Double.valueOf(Prefs.DEF_PHCALSLOPE) * -3; //default ph4 potential
+        phCalV4 = Double.parseDouble(sharedPrefs.getString(Prefs.PREF_PH4_VAL,String.valueOf(defVal)));
+        phCalSlopeLo = Double.parseDouble(sharedPrefs.getString("pref_cal_phslopelo",Prefs.DEF_PHCALSLOPE));
+        phCalSlopeHi = Double.parseDouble(sharedPrefs.getString("pref_cal_phslopehi",Prefs.DEF_PHCALSLOPE));
+        tCalOffset = Double.parseDouble(sharedPrefs.getString("pref_cal_toffset",Prefs.DEF_TCALOFFSET));
+        defVal = Double.valueOf(Prefs.DEF_TCALOFFSET) + Double.valueOf(Prefs.DEF_TCALSLOPE) * 100; //default 100 deg potential
+        tCalV100 = Double.parseDouble(sharedPrefs.getString(Prefs.PREF_T100_VAL,String.valueOf(defVal)));
+        tCalSlope = Double.parseDouble(sharedPrefs.getString("pref_cal_tslope",Prefs.DEF_TCALSLOPE));
+
+        ClCalOffset = Double.parseDouble(sharedPrefs.getString("pref_cal_cl_offset",Prefs.DEF_CLCALOFFSET));
+        ClCalSlope = Double.parseDouble(sharedPrefs.getString("pref_cal_cl_slope",Prefs.DEF_CLCALSLOPE));
+        ClCalLevel = Double.parseDouble(sharedPrefs.getString("pref_cal_cl_level",Prefs.DEF_CLCALLEVEL));
     }
 
     private void setView(int viewNum){
@@ -495,12 +728,29 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
     private void setCalView(){
         if(displayAdvCal){
+            //In adv view
             viewCalAdvDisplay.setVisibility(View.VISIBLE);
             viewCalStdDisplay.setVisibility(View.GONE);
         } else {
+            //In Std. view
             viewCalStdDisplay.setVisibility(View.VISIBLE);
             viewCalAdvDisplay.setVisibility(View.GONE);
         }
+        int phVis, tVis;
+        phVis = (calpHViewActive) ? View.VISIBLE : View.GONE;
+        tVis = (!calpHViewActive) ? View.VISIBLE : View.GONE;
+        tvCalpHLbl[0].setVisibility(phVis);
+        tvCalpHLbl[1].setVisibility(phVis);
+        tvCalpHLbl[2].setVisibility(phVis);
+        tvAvgVals[3].setVisibility(phVis); //avg ph raw adv
+        tvAvgVals[4].setVisibility(phVis); //avg ph raw
+        tvCalTLbl[0].setVisibility(tVis);
+        tvCalTLbl[1].setVisibility(tVis);
+        tvCalTLbl[2].setVisibility(tVis);
+        tvAvgVals[5].setVisibility(tVis); //avg t raw adv
+        tvAvgVals[6].setVisibility(tVis); //avg t raw
+        viewButtons_pH.setVisibility(phVis);
+        viewButtons_T.setVisibility(tVis);
     }
 
     private void startMeasuring(boolean enable){
@@ -524,6 +774,11 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     private void setActionBarSubtitle(){
         if(getSupportActionBar()!=null){
+            if(demoMode){
+                getSupportActionBar().setSubtitle(getResources().getString(R.string.connected_demo));
+                return;
+            }
+
             if(BLE_Connected){
                 if(measuring)
                     getSupportActionBar().setSubtitle(getResources().getString(R.string.connected_measuring));
@@ -537,6 +792,22 @@ public class MeasurementActivity extends AppCompatActivity implements
             Log.e(TAG, "setActionBarSubtitle: Should not be null!");
             finish();
         }
+    }
+
+    private void setDemoMode(boolean en){
+        if(en){
+            demoMode = true;
+            setActionBarSubtitle();
+            startTime = System.currentTimeMillis();
+            timerHandler.postDelayed(timerRunnable, 0);
+        } else {
+            demoMode = false;
+            setActionBarSubtitle();
+            timerHandler.removeCallbacks(timerRunnable);
+
+        }
+
+
     }
     // BLE DEVICE CONTROL
     // Code to manage Service lifecycle.
@@ -552,8 +823,14 @@ public class MeasurementActivity extends AppCompatActivity implements
             }
             Log.d(TAG, "Service Initialized");
             // Automatically connects to the device upon successful start-up initialization.
-            if(!deviceName.equals("TEST")) //todo temporary debug
+            if(!deviceName.equals("DEMOMODE")) {
+                setDemoMode(false);
                 bluetoothLeService.connect(deviceAddress);
+            }
+            else {
+                setDemoMode(true);
+
+            }
         }
 
         @Override
@@ -600,11 +877,11 @@ public class MeasurementActivity extends AppCompatActivity implements
                         data) {
                     if((char)b == '\n'){
                         if (sbRead.length() <= MAX_READ_LINE_LEN){
-                            double[] d = new double[3];
-                            if(parseData(sbRead,d)) {
+                            double[] d = new double[5];
+                            if(parseDataSwCl(sbRead,d)) {
                                 readFails = 0;
                                 if (measuring)
-                                    updateData(d[0],d[1],d[2],eCal);
+                                    updateDataSwCl(d[0],d[1],d[2],d[3],d[4]>0.5);
                             } else {
                                 //parse failed, if three consecutive fails prompt user
                                 readFails++;
@@ -697,7 +974,6 @@ public class MeasurementActivity extends AppCompatActivity implements
                     // set write characteristic to BLE Shield
                     writeCharacteristic = gattCharacteristic;
                     enableWrite = true;
-
 
                 }
                 gattCharacteristicGroupData.add(currentCharaData);
@@ -793,6 +1069,72 @@ public class MeasurementActivity extends AppCompatActivity implements
         }
         return true;
     }
+
+    private boolean parseDataSwCl(StringBuilder sb, double[] data){
+        Log.d(TAG, "parseData: Parsing string:"+sb.toString());
+        int dataPts = 5; //expected number of data points per string
+        StringBuilder[] dataStrings = new StringBuilder[dataPts];
+        for (int i = 0; i < dataStrings.length; i++) {
+            dataStrings[i] = new StringBuilder();
+        }
+
+        if (data.length != dataPts){//invalid array length
+            Log.e(TAG, "parseData: Invalid array size");
+            return false;
+        }
+        int dataIndex = 0;
+        boolean periodFound = false;
+
+        /*iterate through supplied sb parameter, separate into StringBuilder array
+        if data is valid (contains only numbers or one period per string element)
+        and if max number of delimiters (dataPts - 1) is not exceeded.
+        First and last read character must be a space*/
+        int index = 0;
+        boolean spaceExpected;
+        for (char c:
+                sb.toString().toCharArray()) {
+            spaceExpected = index==0 || (index == sb.length()-1);
+            if(spaceExpected && c != ' ') {
+                //First char not space, invalid data
+                Log.d(TAG, "parseData: Invalid string - space char ' ' expected");
+                return false;
+            } else if(!spaceExpected && c == ' '){ //data delimiter encountered
+                dataIndex++;
+                periodFound = false;
+                if(dataIndex > (dataPts-1)){
+                    Log.d(TAG, "parseData: Invalid string - too many space ' ' chars in parsed data");
+                    return false;
+                }
+            } else if(!spaceExpected && isNum(c)){
+                dataStrings[dataIndex].append(c);
+            } else if(!spaceExpected && isPeriod(c)){
+                if(periodFound){
+                    Log.d(TAG, "parseData: Invalid string - too many period '.' chars in parsed data");
+                    return false;
+                }
+                dataStrings[dataIndex].append(c);
+                periodFound = true;
+            }
+            index++;
+        }
+
+        // data parsed into string array, convert and assign to double array
+        for (int i = 0; i < dataPts; i++) {
+            if (dataStrings[i].length()>0){
+                Log.d(TAG, dataStrings[i].toString());
+                try {
+                    data[i] = Double.parseDouble(dataStrings[i].toString());
+                } catch (Exception e){
+                    Log.e(TAG, "parseData: Exception occurred: " +e.toString());
+                }
+            } else {
+                Log.d(TAG, "parseData: Invalid string - empty data point found, i = " + i);
+                return false;
+            }
+        }
+        return true;
+    }
+
     private boolean isNum(char c){
         return (c=='-'||c=='0'||c=='1'||c=='2'||c=='3'||c=='4'||c=='5'||c=='6'||c=='7'||c=='8'||c=='9');
     }
@@ -800,11 +1142,12 @@ public class MeasurementActivity extends AppCompatActivity implements
         return (c=='.');
     }
 
-    private boolean updateData(double t, double e, double i, double eCal){
+    private boolean updateData(double t, double e, double i){
         boolean success;
-        double avgValues[] = new double[4];
-        double stats[] = new double[5];
-        MeasData m = new MeasData(t,e,i,eCal);
+        double avgValues[] = new double[5];
+        double pH_stats[] = new double[5];
+        double t_stats[] = new double[5];
+        MeasData m = new MeasData(t,e,i,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope);
         measList.add(m);
 
         if(measList.size() > maxSampleSize)
@@ -817,13 +1160,16 @@ public class MeasurementActivity extends AppCompatActivity implements
         // (Used for calibration)
         // Also calculate stats over average period
         if(success){
-            averageCalVoltage = avgValues[3];
+            averageCalVoltage_pH = avgValues[3];
+            averageCalVoltage_t = avgValues[4];
             averageCalVoltageValid = true;
         } else {
-            averageCalVoltage = 0.0;
+            averageCalVoltage_pH = 0.0;
+            averageCalVoltage_t = 0.0;
             averageCalVoltageValid = false;
         }
-        // Hide or show Cal. button based on average calc. success
+
+        // Hide or show Cal. buttons based on average calc. success
         updateDisplayCalButton();
 
         // update display with new values, update averages if average calc. successful
@@ -832,18 +1178,102 @@ public class MeasurementActivity extends AppCompatActivity implements
         //Update charts
 
         // update calibration chart
-        List<Double> valuesList = getDoubleFromMeasList(avgSampleSize, MeasData.RAW_VOLTAGE);
+        List<Double> pH_valuesList = getDoubleFromMeasList(avgSampleSize, MeasData.RAW_VOLTAGE);
+        List<Double> t_valuesList = getDoubleFromMeasList(avgSampleSize, MeasData.RAW_TEMPERATURE);
         if (averageCalVoltageValid) {
             //calculate stats
-            stats = calcLR.getStats(valuesList);
+            pH_stats = calcLR.getStats(pH_valuesList);
+            t_stats = calcLR.getStats(t_valuesList);
             //add stats to measList, retrieve last added element
-            if(INCLUDE_STATS)
-                measList.get(measList.size()-1).setpHstats(stats);
-            refreshCalDisplayValues(Collections.max(valuesList) - Collections.min(valuesList),stats);
+            if(INCLUDE_STATS) {
+                measList.get(measList.size() - 1).setpH_stats(pH_stats);
+                measList.get(measList.size() - 1).setT_stats(t_stats);
+            }
+            if(calpHViewActive)
+                refreshCalDisplayValues(Collections.max(pH_valuesList) - Collections.min(pH_valuesList),pH_stats);
+            else
+                refreshCalDisplayValues(Collections.max(t_valuesList) - Collections.min(t_valuesList),t_stats);
         } else {
             clearCalDisplayValues();
         }
-        updateChartSeries(valuesList,(SimpleXYSeries)calPlotSeries_pH,calPlot);
+        if(calpHViewActive)
+            updateChartSeries(pH_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
+        else
+            updateChartSeries(t_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
+
+        // update measurement charts, max sample size for meas plots = 1800
+        // (30 mins @ 1Hz sampling),otherwise interface bogs down. Can be increased
+        // if multi-threading is used or code is optimized
+        updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_TEMPERATURE),
+                (SimpleXYSeries)measPlotSeries_T, measPlot_T);
+
+        updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_PH),
+                (SimpleXYSeries)measPlotSeries_pH, measPlot_pH);
+
+        updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_CL),
+                (SimpleXYSeries)measPlotSeries_Cl, measPlot_Cl);
+        return success;
+    }
+
+    //Update data utlizing switched free Cl measurements
+    private boolean updateDataSwCl(double t, double e, double i, double tMeas, boolean swOn){
+        boolean success;
+        double avgValues[] = new double[5];
+        double pH_stats[] = new double[5];
+        double t_stats[] = new double[5];
+        MeasData m = new MeasData(t,e,i,tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope);
+        measList.add(m);
+
+        if(measList.size() > maxSampleSize)
+            measList.remove(0);
+        // calculate average values, return if averaging operation was successful
+        success = calcAverages(avgValues, avgSampleSize);
+
+
+        // If averages updated successfully, update average voltage and status
+        // (Used for calibration)
+        // Also calculate stats over average period
+        if(success){
+            averageCalVoltage_pH = avgValues[3];
+            averageCalVoltage_t = avgValues[4];
+            averageCalVoltageValid = true;
+        } else {
+            averageCalVoltage_pH = 0.0;
+            averageCalVoltage_t = 0.0;
+            averageCalVoltageValid = false;
+        }
+
+        // Hide or show Cal. buttons based on average calc. success
+        updateDisplayCalButton();
+
+        // update display with new values, update averages if average calc. successful
+        success = refreshDisplayValues(averageCalVoltageValid,avgValues,m);
+
+        //Update charts
+
+        // update calibration chart
+        List<Double> pH_valuesList = getDoubleFromMeasList(avgSampleSize, MeasData.RAW_VOLTAGE);
+        List<Double> t_valuesList = getDoubleFromMeasList(avgSampleSize, MeasData.RAW_TEMPERATURE);
+        if (averageCalVoltageValid) {
+            //calculate stats
+            pH_stats = calcLR.getStats(pH_valuesList);
+            t_stats = calcLR.getStats(t_valuesList);
+            //add stats to measList, retrieve last added element
+            if(INCLUDE_STATS) {
+                measList.get(measList.size() - 1).setpH_stats(pH_stats);
+                measList.get(measList.size() - 1).setT_stats(t_stats);
+            }
+            if(calpHViewActive)
+                refreshCalDisplayValues(Collections.max(pH_valuesList) - Collections.min(pH_valuesList),pH_stats);
+            else
+                refreshCalDisplayValues(Collections.max(t_valuesList) - Collections.min(t_valuesList),t_stats);
+        } else {
+            clearCalDisplayValues();
+        }
+        if(calpHViewActive)
+            updateChartSeries(pH_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
+        else
+            updateChartSeries(t_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
 
         // update measurement charts, max sample size for meas plots = 1800
         // (30 mins @ 1Hz sampling),otherwise interface bogs down. Can be increased
@@ -895,9 +1325,17 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     private boolean refreshDisplayValues(boolean updateAvg, double[] avg, MeasData m) {
         try {
+            boolean ClValid = (double)m.getValue(MeasData.SW_TIME) > CL_MEAS_THRESHOLD;
             //update current values
             for (int i = 0; i < 4; i++) {
-                tvCurrentVals[i].setText(String.format(Locale.CANADA,"%.2f", (double)m.getValue(i)));
+                if(i != MeasData.CALC_CL) {
+                    tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
+                } else {
+                    if (ClValid)
+                        tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
+                    else
+                        tvCurrentVals[i].setText(getResources().getString(R.string.no_val));
+                }
             }
 
             //format pH voltage with one decimal place
@@ -909,13 +1347,24 @@ public class MeasurementActivity extends AppCompatActivity implements
             if (updateAvg) {
                 //update average values
                 for (int i = 0; i < 3; i++) {
-                    tvAvgVals[i].setText(String.format(Locale.CANADA,"%.2f", avg[i]));
+                    if(i != MeasData.CALC_CL) {
+                        tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", avg[i]));
+                    } else {
+                        if (ClValid)
+                            tvAvgVals[i].setText(String.format(Locale.CANADA,"%.2f", (double) m.getValue(i)));
+                        else
+                            tvAvgVals[i].setText(getResources().getString(R.string.no_val));
+                    }
                 }
                 //format pH voltage avg with one decimal place
-                tvAvgVals[3].setText(String.format(Locale.CANADA,"%.1f", avg[3]));
+                tvAvgVals[3].setText(String.format(Locale.CANADA,"%.1f", avg[3])); //ph V Avg, advanced calib. screen
+                tvAvgVals[4].setText(String.format(Locale.CANADA,"%.1f", avg[3])); //ph V Avg, standard calib. screen
+                //format temp voltage avg with one decimal place
+                tvAvgVals[5].setText(String.format(Locale.CANADA,"%.1f", avg[4])); //t V Avg, advanced calib. screen
+                tvAvgVals[6].setText(String.format(Locale.CANADA,"%.1f", avg[4])); //t V Avg, standard calib. screen
             } else {
                 // clear average values
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < 6; i++) {
                     tvAvgVals[i].setText(getResources().getString(R.string.no_val));
                 }
             }
@@ -928,27 +1377,27 @@ public class MeasurementActivity extends AppCompatActivity implements
         }
     }
 
-    private void refreshCalDisplayValues(double range, double[] pH_stats){
+    private void refreshCalDisplayValues(double range, double[] stats){
 
         for (int i = 0; i < 4; i++) {
-            if(!Double.isNaN(pH_stats[i])){
-                tvStats[i].setText(String.format(Locale.CANADA,"%.2f", pH_stats[i])); //set tv if value is num
+            if(!Double.isNaN(stats[i])){
+                tvStats[i].setText(String.format(Locale.CANADA,"%.2f", stats[i])); //set tv if value is num
             }
             else
                 tvStats[i].setText(getResources().getString(R.string.no_val)); //else clear (NaN)
         }
         // last value in array is score, format to one decimal and apply to two tv's
-        if(!Double.isNaN(pH_stats[4])){
-            tvStats[4].setText(String.format(Locale.CANADA,"%.1f", pH_stats[4]));
-            tvStats[5].setText(String.format(Locale.CANADA,"%.1f", pH_stats[4]));
+        if(!Double.isNaN(stats[4])){
+            tvStats[4].setText(String.format(Locale.CANADA,"%.1f", stats[4]));
+            tvStats[5].setText(String.format(Locale.CANADA,"%.1f", stats[4]));
             //set color based on range values falls in
-            if(pH_stats[4]<65){
+            if(stats[4]<65){
                 tvStats[4].setTextColor(Color.RED);
                 tvStats[5].setTextColor(Color.RED);
-            } else if(pH_stats[4]>=65&&pH_stats[4]<80){
+            } else if(stats[4]>=65&&stats[4]<80){
                 tvStats[4].setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
                 tvStats[5].setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
-            } else if(pH_stats[4]>=80){
+            } else if(stats[4]>=80){
                 tvStats[4].setTextColor(Color.GREEN);
                 tvStats[5].setTextColor(Color.GREEN);
             }
@@ -975,16 +1424,24 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
 
     private void updateSettingsDisplay(){
-        tvEcal.setText(String.format(Locale.CANADA,"%.1f", eCal));
+        tvEcal.setText(String.format(Locale.CANADA,"%.1f", phCalOffset));
         tvSampSize.setText(String.format(Locale.CANADA,"%d", maxSampleSize));
         tvAvgSize.setText(String.format(Locale.CANADA,"%d", avgSampleSize));
     }
 
     private void updateDisplayCalButton(){
         if(averageCalVoltageValid) {
-            btnCal.setVisibility(View.VISIBLE);
+            btnCal_pH4.setVisibility(View.VISIBLE);
+            btnCal_pH7.setVisibility(View.VISIBLE);
+            btnCal_pH10.setVisibility(View.VISIBLE);
+            btnCal_tLo.setVisibility(View.VISIBLE);
+            btnCal_tHi.setVisibility(View.VISIBLE);
         } else {
-            btnCal.setVisibility(View.INVISIBLE);
+            btnCal_pH4.setVisibility(View.INVISIBLE);
+            btnCal_pH7.setVisibility(View.INVISIBLE);
+            btnCal_pH10.setVisibility(View.INVISIBLE);
+            btnCal_tLo.setVisibility(View.INVISIBLE);
+            btnCal_tHi.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -1014,8 +1471,8 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
 
     private boolean calcAverages(double[] avg, int samples){
-        double scratch[] = new double[] {0.0,0.0,0.0,0.0}; // scratch double array for calculating sum
-        if (avg.length != 4){//invalid array length
+        double scratch[] = new double[] {0.0,0.0,0.0,0.0,0.0}; // scratch double array for calculating sum
+        if (avg.length != 5){//invalid array length
             Log.e(TAG, "calcAverages: Invalid array size");
             return false;
         }
@@ -1027,11 +1484,13 @@ public class MeasurementActivity extends AppCompatActivity implements
                     scratch[1] = scratch[1] + (double)measList.get(s-i-1).getValue(MeasData.CALC_PH);
                     scratch[2] = scratch[2] + (double)measList.get(s-i-1).getValue(MeasData.CALC_CL);
                     scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
+                    scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
                 }
                 avg[0] = scratch[0]/samples;
                 avg[1] = scratch[1]/samples;
                 avg[2] = scratch[2]/samples;
                 avg[3] = scratch[3]/samples;
+                avg[4] = scratch[4]/samples;
             } catch (Exception e){
                 Log.e(TAG, "calcAverages: Exception occurred: " +e.toString());
                 return false;
@@ -1057,8 +1516,11 @@ public class MeasurementActivity extends AppCompatActivity implements
                 "pH Level",
                 "Free Cl (ppm)",
                 "pH (mV)",
-                "Free Cl (nA)"
+                "Free Cl (nA)",
+                "Interval Time",
+                "Free Cl Sw. On"
         };
+
         //Additional stats column headers
         String[] sch = new String[]{
                 "Avg. Ok",
@@ -1104,13 +1566,13 @@ public class MeasurementActivity extends AppCompatActivity implements
         //Location, google maps URL
         headers[3] = "Location Url: \t"+sUrl;
         //Calibration voltage
-        headers[4] = "Calibration Voltage, Ecal [pH = 7] (mV): \t"+String.format(Locale.CANADA,"%.3f",eCal);
+        headers[4] = "Calibration Voltage, Ecal [pH = 7] (mV): \t"+String.format(Locale.CANADA,"%.3f", phCalOffset);
         //Data column headers
         if(INCLUDE_STATS)
-            headers[5] = ch[0]+'\t'+ch[1]+'\t'+ch[2]+'\t'+ch[3]+'\t'+ch[4]+'\t'+ch[5]+'\t'+
+            headers[5] = ch[0]+'\t'+ch[1]+'\t'+ch[2]+'\t'+ch[3]+'\t'+ch[4]+'\t'+ch[5]+'\t'+ch[6]+'\t'+ch[7]+
                     sch[0]+'\t'+sch[1]+'\t'+sch[2]+'\t'+sch[3]+'\t'+sch[4]+'\t'+sch[5];
         else
-            headers[5] = ch[0]+'\t'+ch[1]+'\t'+ch[2]+'\t'+ch[3]+'\t'+ch[4]+'\t'+ch[5];
+            headers[5] = ch[0]+'\t'+ch[1]+'\t'+ch[2]+'\t'+ch[3]+'\t'+ch[4]+'\t'+ch[5]+'\t'+ch[6]+'\t'+ch[7];
 
         //Write String data to dataArray
         for (String s:
@@ -1121,8 +1583,10 @@ public class MeasurementActivity extends AppCompatActivity implements
         for (MeasData md:
                 measList) {
             if(INCLUDE_STATS){
-                double s[] = md.getpH_stats();
+                double pH_stats[] = md.getpH_stats();
+                double t_stats[] = md.getT_stats();
                 dataArray.add(String.format(Locale.CANADA,"%s\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f" +
+                                "\t%.2f\t%b" +
                                 "\t%b\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
                         md.getValue(MeasData.TIME_STAMP),
                         md.getValue(MeasData.CALC_TEMPERATURE),
@@ -1130,16 +1594,26 @@ public class MeasurementActivity extends AppCompatActivity implements
                         md.getValue(MeasData.CALC_CL),
                         md.getValue(MeasData.RAW_VOLTAGE),
                         md.getValue(MeasData.RAW_CURRENT),
-                        md.getAvgOk(),s[0],s[1],s[2],s[3],s[4]
-                        ));
+                        //free Cl sw meas info
+                        md.getValue(MeasData.SW_TIME),
+                        md.getValue(MeasData.CL_SW),
+                        //measurement stats
+                        md.getAvgOk(),
+                        pH_stats[0],pH_stats[1],pH_stats[2],pH_stats[3],pH_stats[4],
+                        t_stats[0],t_stats[1],t_stats[2],t_stats[3],t_stats[4]
+                ));
             } else {
-                dataArray.add(String.format(Locale.CANADA,"%s\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f",
+                dataArray.add(String.format(Locale.CANADA,"%s\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f"+"\t%.2f\t%b",
                         md.getValue(MeasData.TIME_STAMP),
                         md.getValue(MeasData.CALC_TEMPERATURE),
                         md.getValue(MeasData.CALC_PH),
                         md.getValue(MeasData.CALC_CL),
                         md.getValue(MeasData.RAW_VOLTAGE),
-                        md.getValue(MeasData.RAW_CURRENT)));
+                        md.getValue(MeasData.RAW_CURRENT),
+                        //free Cl sw meas info
+                        md.getValue(MeasData.SW_TIME),
+                        md.getValue(MeasData.CL_SW)
+                ));
             }
 
         }

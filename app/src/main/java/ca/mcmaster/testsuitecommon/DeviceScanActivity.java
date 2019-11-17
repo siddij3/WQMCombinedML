@@ -51,7 +51,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import ca.mcmaster.potentiostat.ExperimentActivity;
+import ca.mcmaster.potentiostat.ExpSelectActivity;
 import ca.mcmaster.waterqualitymonitorsuite.MeasurementActivity;
 import ca.mcmaster.waterqualitymonitorsuite.Prefs;
 import ca.mcmaster.waterqualitymonitorsuite.R;
@@ -82,12 +82,19 @@ public class DeviceScanActivity extends AppCompatActivity {
 
     private ListView listView;
 
-    private Button btnDbg; //todo debug
+    private Button btnDemo; //todo debug
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_devicescan);
-        getSupportActionBar().setTitle(R.string.title_devices);
+        if (getSupportActionBar()!=null) {
+            getSupportActionBar().setTitle(R.string.title_devices);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            Log.e(TAG, "onCreate: Action support bar should not be null");
+            finish();
+        }
+
         mHandler = new Handler();
 
         //Intent and extra data
@@ -198,7 +205,7 @@ public class DeviceScanActivity extends AppCompatActivity {
                         startActivity(intentWQM);
                         break;
                     case "PStat":
-                        final Intent intentPStat = new Intent(DeviceScanActivity.this,ExperimentActivity.class);
+                        final Intent intentPStat = new Intent(DeviceScanActivity.this,ExpSelectActivity.class);
                         intentPStat.putExtra(EXTRAS_DEVICE_NAME, device.getName());
                         intentPStat.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
                         startActivity(intentPStat);
@@ -213,9 +220,9 @@ public class DeviceScanActivity extends AppCompatActivity {
         });
 
         //todo debug button
-        btnDbg = (Button) findViewById(R.id.btnDebug);
-        //btnDbg.setVisibility(View.GONE);
-        btnDbg.setOnClickListener(new View.OnClickListener() {
+        btnDemo = (Button) findViewById(R.id.btnDemo);
+        //btnDemo.setVisibility(View.GONE);
+        btnDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mScanning)
@@ -224,14 +231,14 @@ public class DeviceScanActivity extends AppCompatActivity {
                 switch (selectedApp) {
                     case "WQM":
                         final Intent intent = new Intent(DeviceScanActivity.this, MeasurementActivity.class);
-                        intent.putExtra(EXTRAS_DEVICE_NAME, "TEST");
-                        intent.putExtra(EXTRAS_DEVICE_ADDRESS, "TEST_ADD");
+                        intent.putExtra(EXTRAS_DEVICE_NAME, "DEMOMODE");
+                        intent.putExtra(EXTRAS_DEVICE_ADDRESS, "DEMOMODE_ADD");
                         startActivity(intent);
                         break;
                     case "PStat":
-                        final Intent intentPStat = new Intent(DeviceScanActivity.this,ExperimentActivity.class);
-                        intentPStat.putExtra(EXTRAS_DEVICE_NAME, "TEST");
-                        intentPStat.putExtra(EXTRAS_DEVICE_ADDRESS, "TEST_ADD");
+                        final Intent intentPStat = new Intent(DeviceScanActivity.this,ExpSelectActivity.class);
+                        intentPStat.putExtra(EXTRAS_DEVICE_NAME, "DEMOMODE");
+                        intentPStat.putExtra(EXTRAS_DEVICE_ADDRESS, "DEMOMODE_ADD");
                         startActivity(intentPStat);
                         break;
                     default:
@@ -265,6 +272,9 @@ public class DeviceScanActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.menu_scan:
                 mLeDeviceListAdapter.clear();
                 scanLeDevice(true);

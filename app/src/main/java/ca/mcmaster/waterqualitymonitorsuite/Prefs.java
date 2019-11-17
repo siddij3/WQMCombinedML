@@ -17,7 +17,18 @@ public class Prefs extends AppCompatActivity {
 
     public final static String DEF_SAMPLES = "50";
     public final static String DEF_AVERAGE = "10";
-    public final static String DEF_ECAL = "280";
+    public final static String DEF_PHCALOFFSET = "280";
+    public final static String DEF_PHCALSLOPE = "60.6";
+    public final static String DEF_TCALSLOPE = "100";
+    public final static String DEF_TCALOFFSET = "0";
+    public final static String DEF_CLCALSLOPE = "342.0";
+    public final static String DEF_CLCALOFFSET = "109.6";
+    public final static String DEF_CLCALLEVEL = "0.0";
+
+    //Preference keys for settings not available from UI
+    public final static String PREF_T100_VAL = "pref_cal_t100"; //preference key for storing T=100 voltage
+    public final static String PREF_PH4_VAL = "pref_cal_ph4"; //preference key for storing pH=4 voltage
+    public final static String PREF_PH10_VAL = "pref_cal_ph7"; //preference key for storing pH=10 voltage
 
     private PF prefFrag; //preference fragment
 
@@ -43,7 +54,7 @@ public class Prefs extends AppCompatActivity {
                                                           String key) {
                         verifyIntPreferences(sharedPreferences);
                         //Notify MeasurementActivity if certain settings updated
-                        if (key.equals("pref_average")||key.equals("pref_samples")||key.equals("pref_cal_ph7"))
+                        if (key.equals("pref_average")||key.equals("pref_samples")||key.equals("pref_cal_ph7")) //TODO: check if more keys need to be added
                             setResult(MeasurementActivity.REQUEST_CODE_NOTIFY_IF_UPDATED);
                     }
                 };

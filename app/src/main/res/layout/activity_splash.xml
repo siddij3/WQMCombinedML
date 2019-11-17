@@ -23,7 +23,7 @@
 
     <Button
         android:id="@+id/btnLaunchWQM"
-        android:layout_width="220dp"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="80dp"
@@ -36,7 +36,7 @@
 
     <Button
         android:id="@+id/btnLaunchPStat"
-        android:layout_width="220dp"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="200dp"

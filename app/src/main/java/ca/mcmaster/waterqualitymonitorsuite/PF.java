@@ -23,15 +23,16 @@ public class PF extends PreferenceFragment
         etextSamples = (EditTextPreference) findPreference("pref_samples");
         etextEcal = (EditTextPreference) findPreference("pref_cal_ph7");
 
-        //"button" to reset Ecal to default value
+        //"button" to reset Ecal to default value, currently not implemented
+        /*
         Preference button = findPreference("reset_ecal");
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                etextEcal.setText(Prefs.DEF_ECAL);
+                etextEcal.setText(Prefs.DEF_PHCALOFFSET);
                 return true;
             }
-        });
+        });*/
 
     }
 

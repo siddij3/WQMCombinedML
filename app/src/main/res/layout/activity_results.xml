@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ca.mcmaster.potentiostat.ResultsActivity">
+
+    <com.androidplot.xy.XYPlot
+        android:id="@+id/plotPotResults"
+        style="@style/APDefacto.Light"
+        android:layout_width="wrap_content"
+        android:layout_height="500dp"
+
+        android:layout_marginStart="0dp"
+
+        android:layout_marginTop="0dp"
+        app:backgroundColor="#FFFFFF"
+        app:borderColor="#FFFFFF"
+        app:borderThickness="0dp"
+        app:domainTitle="@string/lbl_pot_voltage"
+        app:graphBackgroundColor="#FFFFFF"
+        app:graphPaddingLeft="8dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lineLabelRotationBottom="-45"
+        app:lineLabelTextSizeBottom="10sp"
+        app:lineLabelTextSizeLeft="9sp"
+        app:lineLabels="left|bottom"
+        app:rangeTitle="@string/lbl_pot_current"
+        app:title="" />
+</android.support.constraint.ConstraintLayout>

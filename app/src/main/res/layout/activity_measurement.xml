@@ -11,8 +11,10 @@
         android:id="@+id/layoutPrefs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -99,8 +101,8 @@
             android:layout_gravity="center"
             android:layout_row="0"
             android:padding="5dp"
-            android:textAlignment="center"
             android:text="@string/no_val"
+            android:textAlignment="center"
             app:layout_constraintLeft_toRightOf="@+id/lblSamples"
             app:layout_constraintTop_toTopOf="parent" />
     </GridLayout>
@@ -109,9 +111,9 @@
         android:id="@+id/layoutMeas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
         android:layout_marginStart="0dp"
         android:layout_marginTop="2dp"
+        android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutPrefs">
         <!-- Measurement Layout -->
@@ -129,6 +131,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
+                android:layout_gravity="center_horizontal"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -342,7 +345,7 @@
                 app:lineLabelTextSizeLeft="9sp"
                 app:lineLabels="left|bottom"
                 app:rangeTitle="@string/lbl_ph"
-                app:title=""/>
+                app:title="" />
 
             <com.androidplot.xy.XYPlot
                 android:id="@+id/measPlot_Cl"
@@ -350,10 +353,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="320dp"
 
-                android:layout_marginStart="0dp"
-
-                android:layout_marginTop="0dp"
                 android:layout_marginBottom="5dp"
+
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
                 app:backgroundColor="#FFFFFF"
                 app:borderColor="#FFFFFF"
                 app:domainTitle="Time/Sample"
@@ -382,7 +385,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutPrefs">
 
@@ -394,7 +397,7 @@
             android:layout_marginLeft="0dp"
             android:layout_marginTop="0dp"
             android:orientation="vertical"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layoutPrefs">
 
@@ -405,6 +408,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginTop="2dp"
+                android:layout_gravity="center_horizontal"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -505,7 +509,22 @@
                     android:padding="2dp"
                     android:text="@string/lbl_averageph_Adv"
                     android:textAppearance="@android:style/TextAppearance.Material.Small"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/lblavgRawT_Adv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:padding="2dp"
+                    android:text="@string/lbl_avgTempRaw_Adv"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/val_avgPhRaw_Adv"
@@ -520,7 +539,24 @@
                     android:text="@string/no_val"
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/val_avgTRaw_Adv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/lblmV"
@@ -539,7 +575,7 @@
             </GridLayout>
 
             <TextView
-                android:id="@+id/lblStats"
+                android:id="@+id/lblStats_pH"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
@@ -548,7 +584,21 @@
                 android:padding="2dp"
                 android:text="@string/lbl_pHStats"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/lblStats_T"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="2dp"
+                android:padding="2dp"
+                android:text="@string/lbl_rawTStats"
+                android:textAppearance="@android:style/TextAppearance.Material.Small"
+                android:textStyle="italic"
+                android:visibility="gone" />
 
             <GridLayout
                 android:id="@+id/layoutStats1"
@@ -556,6 +606,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
+                android:layout_gravity="center_horizontal"
                 app:layout_constraintHorizontal_bias="1.0">
 
                 <!-- Row 0 -->
@@ -719,9 +770,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="20dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="0dp"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <!-- Row 0 -->
             <TextView
@@ -733,7 +785,20 @@
                 android:layout_row="0"
                 android:padding="10dp"
                 android:text="@string/lbl_averageph"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/lblavgRawT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_gravity="top|center"
+                android:layout_row="0"
+                android:padding="10dp"
+                android:text="@string/lbl_avgTempRaw"
+                android:textStyle="italic"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/lblScoreLarge"
@@ -761,7 +826,25 @@
                 android:textAlignment="center"
                 android:textAppearance="@android:style/TextAppearance.Material.Large"
                 android:textSize="36sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/val_avgTRaw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_gravity="top|center"
+                android:layout_marginBottom="4dp"
+                android:layout_row="1"
+                android:minWidth="80dp"
+                android:padding="10dp"
+                android:text="@string/no_val"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/val_score"
@@ -795,24 +878,88 @@
             app:lineLabelTextSizeBottom="10sp"
             app:lineLabelTextSizeLeft="9sp"
             app:lineLabels="left|bottom"
-            app:rangeTitle="@string/lbl_phRaw"
+            app:rangeTitle="@string/lbl_calV"
             app:title="" />
 
-        <Button
-            android:id="@+id/btnCal_pH7"
+        <LinearLayout
+            android:id="@+id/calButtons_pH"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="visible">
+            <Button
+                android:id="@+id/btnCal_pH4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
 
-            android:elevation="1dp"
-            android:text="@string/btn_cal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.417"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutCalPlot" />
+                android:layout_weight="1"
+                android:elevation="1dp"
+                android:text="@string/btn_cal_pH4" />
+            <Button
+                android:id="@+id/btnCal_pH7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+
+                android:layout_weight="1"
+                android:elevation="1dp"
+                android:text="@string/btn_cal_pH7" />
+            <Button
+                android:id="@+id/btnCal_pH10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+
+                android:layout_weight="1"
+                android:elevation="1dp"
+                android:text="@string/btn_cal_pH10" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/calButtons_T"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnCal_Tlow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+
+                android:layout_weight="1"
+                android:elevation="1dp"
+                android:text="@string/btn_cal_Tlow" />
+
+            <Button
+                android:id="@+id/btnCal_Thigh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+
+                android:layout_weight="1"
+                android:elevation="1dp"
+                android:text="@string/btn_cal_Thigh" />
+
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -8,13 +8,14 @@
     <string name="title_splash">Sensor Device Scan</string>
     <string name="btn_launchWQM">Water Quality Monitor\n\nTemperature, pH level, and free Cl measurements</string>
     <string name="lbl_launch">Select Application to Run:</string>
-    <string name="btn_launchPStat">Potentiostat Electroanalysis\n\nCyclic Voltammetry (CV) and Differential Pulse Voltammetry</string>
+    <string name="btn_launchPStat">Potentiostat Electroanalysis\n\nLinear Sweep Voltammetry (LSV), Cyclic Voltammetry (CV), Square Wave Voltammetry (SWV), and Differential Pulse Voltammetry (DPV)</string>
 
     <!-- Device Scan Activity -->
     <string name="title_devices">Sensor Device Scan</string>
     <string name="ble_not_supported">Error: BLE is not supported on this device</string>
     <string name="label_device_address">Device address:</string>
 
+    <string name="btn_demo">Connect</string>
 
     <string name="error_bluetooth_not_supported">Error: Bluetooth not supported on this device</string>
     <string name="unknown_device">Unknown device</string>
@@ -29,10 +30,16 @@
     <!--******** Potentiostat ********-->
 
     <string name="title_activity_experiment">Potentiostat</string>
+    <string name="title_pot_results">Results</string>
+    <string name="title_edit_exp">Edit Experiment</string>
+    <string name="title_new_exp">Create New Experiment</string>
     <string name="lbl_exp_select">Select Experiment:</string>
     <string name="btn_edit_selected">Edit Selected Experiment</string>
     <string name="btn_run_selected">Run Selected Experiment</string>
     <string name="btn_create_new">Create New Experiment</string>
+    <string name="lbl_pot_current">Current (A)</string>
+    <string name="lbl_pot_voltage">Voltage (mV)</string>
+    <string name="void_selection">&lt;none selected&gt;</string>
 
     <!--******** Water Quality Monitor ********-->
 
@@ -43,7 +50,8 @@
     <string name="menu_export_local">Export to Device (Local)</string>
     <string name="menu_export_cloud">Export to Drive (Cloud)</string>
     <string name="menu_change_view_meas">Measurement View</string>
-    <string name="menu_change_view_cal">Calibration View</string>
+    <string name="menu_change_view_cal_pH">Calibration View (pH)</string>
+    <string name="menu_change_view_cal_T">Calibration View (Temp.)</string>
 
     <string name="blank"> </string>
 
@@ -52,6 +60,7 @@
     <string name="disconnected">Disconnected</string>
     <string name="connected_measuring">Connected: Recording</string>
     <string name="connected_stopped">Connected: Stopped</string>
+    <string name="connected_demo">Connected: WQM Board</string>
     <string name="lbl_Samples">Samples Collected:</string>
 
     <string name="lbl_temp">Temp. (&#176;C)</string>
@@ -61,15 +70,24 @@
     <string name="lbl_average">Average:</string>
     <string name="no_val">-</string>
 
-    <string name="lbl_tempRaw">Temp.(&#176;C)</string>
+    <string name="lbl_tempRaw">Temp.(mV)</string>
     <string name="lbl_phRaw">pH (mV)</string>
     <string name="lbl_chlorineRaw">Free Cl(nA)</string>
     <string name="lbl_rawVal">Raw Values:</string>
-    <string name="lbl_averageph">Average pH (mV)</string>
-    <string name="lbl_mV">mV</string>
 
+    <string name="lbl_mV">mV</string>
+    <string name="lbl_calV">Cal. Voltage (mV)</string>
+
+
+    <string name="lbl_averageph">Average pH (mV)</string>
     <string name="lbl_averageph_Adv">Avg. pH</string>
+
+    <string name="lbl_avgTempRaw">Average T<sub><small>raw</small></sub> (mV)</string>
+    <string name="lbl_avgTempRaw_Adv">Avg T<sub><small>raw</small></sub></string>
+
     <string name="lbl_pHStats">pH Statistics:</string>
+    <string name="lbl_rawTStats">Raw T Statistics:</string>
+
     <string name="lbl_pkpk">pk-pk(mV)</string>
     <string name="lbl_slope">slope<sub><small>LR</small></sub>(mV)</string>
     <string name="lbl_r2">R<small><sup>2</sup><sub>LR</sub></small></string>
@@ -79,7 +97,12 @@
 
     <string name="btn_start">Start Read</string>
 
-    <string name="btn_cal">Calibrate pH7</string>
+    <string name="btn_cal_pH4">Calibrate pH4</string>
+    <string name="btn_cal_pH7">Calibrate pH7</string>
+    <string name="btn_cal_pH10">Calibrate pH10</string>
+
+    <string name="btn_cal_Tlow">Calibrate Low Temp. (0&#176;C)</string>
+    <string name="btn_cal_Thigh">Calibrate High Temp. (100&#176;C)</string>
 
     <string name="lbl_AvgSize">Average Size:</string>
     <string name="lbl_SampSize">Sample Size:</string>
@@ -95,5 +118,7 @@
     <string name="file_created">File created: %s</string>
     <string name="file_create_error">Error: unable to create file</string>
 
-
+    <string-array name="array_name">
+        <item>Cyclic Voltammetry (CV)</item>
+    </string-array>
 </resources>

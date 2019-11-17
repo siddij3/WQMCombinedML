@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ca.mcmaster.waterqualitymonitorsuite;
+package ca.mcmaster.testsuitecommon;
 
 import java.util.HashMap;
 

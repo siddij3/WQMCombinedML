@@ -28,18 +28,89 @@
     <PreferenceCategory
         android:title="@string/pref_calibration_title">
 
-    <EditTextPreference
-        android:id="@+id/etPref_Cal_pH7"
-        android:defaultValue="280"
-        android:key="pref_cal_ph7"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:inputType="number|numberDecimal|numberSigned"
-        android:title="pH Calculation Calibration Voltage (Ecal)"
-        android:summary="Enter the voltage (in mV) corresponding to a pH level of 7.0. Used for correctly converting voltage to pH" />
-    <Preference android:title="Reset Ecal Voltage"
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_pH7"
+            android:defaultValue="280"
+            android:key="pref_cal_ph7"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="pH Calculation Calibration Offset Voltage"
+            android:summary="Enter the voltage (in mV) corresponding to a pH level of 7.0. Used for correctly converting voltage to pH" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_phslopelo"
+            android:defaultValue="60"
+            android:key="pref_cal_phslopelo"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="pH &lt; 7 Calculation Calibration Slope"
+            android:summary="Enter the slope of pH sensor in mV per pH level for pH &lt; 7. Used for correctly converting voltage to pH" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_phslopehi"
+            android:defaultValue="60"
+            android:key="pref_cal_phslopehi"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="pH &gt; 7 Calculation Calibration Slope"
+            android:summary="Enter the slope of pH sensor in mV per pH level for pH &gt; 7. Used for correctly converting voltage to pH" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_toffset"
+            android:defaultValue="100"
+            android:key="pref_cal_toffset"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="Temp. Calculation Calibration Offset Voltage"
+            android:summary="Enter the voltage (in mV) corresponding to a temperature of 0 degrees Celsius. Used for correctly converting voltage to temperature" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_tslope"
+            android:defaultValue="100"
+            android:key="pref_cal_tslope"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="Temp. Calculation Calibration Slope"
+            android:summary="Enter the slope of temperature sensor in mV per degree Celsius. Used for correctly converting voltage to temperature" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_cloffset"
+            android:defaultValue="0"
+            android:key="pref_cal_cl_offset"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="Free Cl Calculation Calibration Offset Current"
+            android:summary="Enter the current (in nA) corresponding to a ppm of selected value (below). Used for correctly converting current to ppm" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_cllevel"
+            android:defaultValue="0"
+            android:key="pref_cal_cl_level"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="Free Cl Calculation Calibration Offset Level (ppm)"
+            android:summary="Enter the ppm value corresponding to the measured offset (above). Used for correctly converting current to ppm" />
+
+        <EditTextPreference
+            android:id="@+id/etPref_Cal_clslope"
+            android:defaultValue="342"
+            android:key="pref_cal_cl_slope"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:title="Free Cl Calculation Calibration Slope"
+            android:summary="Enter the slope of free Cl sensor in nA per ppm. Used for correctly converting current to ppm" />
+
+<!--       <Preference android:title="Reset Ecal Voltage"
         android:key="reset_ecal"
-        android:summary="Resets pH calculation calibration to default value"/>
+        android:summary="Resets pH calculation calibration to default value"/>-->
 
 
     </PreferenceCategory>

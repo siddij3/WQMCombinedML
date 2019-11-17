@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ca.mcmaster.waterqualitymonitorsuite;
+package ca.mcmaster.testsuitecommon;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -137,7 +137,7 @@ public class BluetoothLeService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        BluetoothLeService getService() {
+        public BluetoothLeService getService() {
             return BluetoothLeService.this;
         }
     }
