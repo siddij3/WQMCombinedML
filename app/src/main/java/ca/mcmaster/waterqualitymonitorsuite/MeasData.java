@@ -69,7 +69,7 @@ class MeasData {
         pH_stats = new double[5];
         t_stats = new double[5];
     }
-
+    //Meas data calculation currently used
     MeasData(double rawT, double rawE, double rawI, double measTime, boolean swOn, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens, double Cl_Cal_i, double Cl_Cal_lvl, double Cl_Sens){
         this.rawT = rawT;
         this.rawE = rawE;
@@ -216,6 +216,9 @@ class MeasData {
     private double calcCl(double i){
         double k, f_i, result;
         Log.d(TAG, String.format("calcCl: i: %.3f ",i));
+        //Cl_Cal_i = current offset, f_i = meas. current - Cl_Cal_i
+        //Cl_Cal_lvl = level (in ppm) when f_i is 0
+        //Cl_Sens = current / ppm slope
 
         k = 0.57;
         f_i = i - Cl_Cal_i;

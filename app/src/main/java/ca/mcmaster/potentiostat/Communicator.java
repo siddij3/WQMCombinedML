@@ -356,7 +356,7 @@ public class Communicator
                     display.infoOut("Scans: " + scans, InterfaceToUI.P_LOW);
 
                 } else {
-                    //Log.wtf("dont care","Should not be here");
+                    // Do nothing
                 }
             } catch(Exception e) {
                 display.dbgOut("Input Handler exception occurred: (" + e.toString() + ")");

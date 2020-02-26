@@ -1331,10 +1331,13 @@ public class MeasurementActivity extends AppCompatActivity implements
                 if(i != MeasData.CALC_CL) {
                     tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
                 } else {
-                    if (ClValid)
+                    if (ClValid) {
                         tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
-                    else
-                        tvCurrentVals[i].setText(getResources().getString(R.string.no_val));
+                        tvCurrentVals[i].setTextSize(18);
+                    }else{
+                        tvCurrentVals[i].setText(getResources().getString(R.string.cl_not_valid));
+                        tvCurrentVals[i].setTextSize(10);
+                    }
                 }
             }
 
@@ -1350,10 +1353,13 @@ public class MeasurementActivity extends AppCompatActivity implements
                     if(i != MeasData.CALC_CL) {
                         tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", avg[i]));
                     } else {
-                        if (ClValid)
-                            tvAvgVals[i].setText(String.format(Locale.CANADA,"%.2f", (double) m.getValue(i)));
-                        else
-                            tvAvgVals[i].setText(getResources().getString(R.string.no_val));
+                        if (ClValid) {
+                            tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
+                            tvAvgVals[i].setTextSize(18);
+                        } else {
+                            tvAvgVals[i].setText(getResources().getString(R.string.cl_not_valid));
+                            tvAvgVals[i].setTextSize(10);
+                        }
                     }
                 }
                 //format pH voltage avg with one decimal place

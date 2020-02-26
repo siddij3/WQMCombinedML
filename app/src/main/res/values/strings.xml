@@ -69,6 +69,7 @@
     <string name="lbl_current">Current:</string>
     <string name="lbl_average">Average:</string>
     <string name="no_val">-</string>
+    <string name="cl_not_valid">waiting for\nmeasurements</string>
 
     <string name="lbl_tempRaw">Temp.(mV)</string>
     <string name="lbl_phRaw">pH (mV)</string>
