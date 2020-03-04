@@ -86,6 +86,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     private int activeView;
     private SharedPreferences sharedPrefs;
 
+    private boolean ValidClRecorded; //atleast one valid Cl measurement obtained since starting measurement
     private boolean calpHViewActive;
     private boolean measuring;
     private int readFails;
@@ -333,7 +334,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         measPlot_Cl = (XYPlot) findViewById(R.id.measPlot_Cl);
         measPlot_Cl.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
         measPlotSeries_Cl = new SimpleXYSeries("Free Cl");
-        measPlot_Cl.addSeries(measPlotSeries_Cl, new LineAndPointFormatter(Color.GREEN, null, null, null));
+        measPlot_Cl.addSeries(measPlotSeries_Cl, new LineAndPointFormatter(Color.RED, null, null, null));
 
 
         //pH7 calibrate button and click listener
@@ -769,6 +770,7 @@ public class MeasurementActivity extends AppCompatActivity implements
             }
             measuring = false;
         }
+        ValidClRecorded = false;
         setActionBarSubtitle();
     }
 
@@ -1325,16 +1327,19 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     private boolean refreshDisplayValues(boolean updateAvg, double[] avg, MeasData m) {
         try {
-            boolean ClValid = (double)m.getValue(MeasData.SW_TIME) > CL_MEAS_THRESHOLD;
+            boolean CurrClValid = (double)m.getValue(MeasData.SW_TIME) > CL_MEAS_THRESHOLD;
+            if(CurrClValid){
+                ValidClRecorded = true;
+            }
             //update current values
             for (int i = 0; i < 4; i++) {
                 if(i != MeasData.CALC_CL) {
                     tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
                 } else {
-                    if (ClValid) {
+                    if (CurrClValid) {
                         tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
-                        tvCurrentVals[i].setTextSize(18);
-                    }else{
+                        tvCurrentVals[i].setTextSize(24);
+                    } else if (!ValidClRecorded){
                         tvCurrentVals[i].setText(getResources().getString(R.string.cl_not_valid));
                         tvCurrentVals[i].setTextSize(10);
                     }
@@ -1353,10 +1358,10 @@ public class MeasurementActivity extends AppCompatActivity implements
                     if(i != MeasData.CALC_CL) {
                         tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", avg[i]));
                     } else {
-                        if (ClValid) {
-                            tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
-                            tvAvgVals[i].setTextSize(18);
-                        } else {
+                        if (CurrClValid) {
+                            tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) avg[i]));
+                            tvAvgVals[i].setTextSize(24);
+                        } else if (!ValidClRecorded) {
                             tvAvgVals[i].setText(getResources().getString(R.string.cl_not_valid));
                             tvAvgVals[i].setTextSize(10);
                         }

@@ -72,7 +72,8 @@
             android:layout_row="1"
             android:padding="5dp"
             android:text="@string/lbl_Ecal"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/val_ecal"
@@ -83,7 +84,8 @@
             android:layout_row="1"
             android:padding="5dp"
             android:text="@string/no_val"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/lblSamples"
@@ -181,7 +183,8 @@
                     android:padding="5dp"
                     android:text="@string/lbl_temp"
                     tools:layout_editor_absoluteX="41dp"
-                    tools:layout_editor_absoluteY="141dp" />
+                    tools:layout_editor_absoluteY="141dp"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/lblPh"
@@ -191,6 +194,7 @@
                     android:layout_row="0"
                     android:padding="5dp"
                     android:text="@string/lbl_ph"
+                    android:visibility="gone"
                     tools:layout_editor_absoluteX="41dp"
                     tools:layout_editor_absoluteY="141dp" />
 
@@ -218,6 +222,7 @@
                     android:text="@string/no_val"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     tools:layout_editor_absoluteX="41dp"
                     tools:layout_editor_absoluteY="141dp" />
 
@@ -234,6 +239,7 @@
                     android:text="@string/no_val"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     tools:layout_editor_absoluteX="41dp"
                     tools:layout_editor_absoluteY="141dp" />
 
@@ -250,6 +256,7 @@
                     android:text="@string/no_val"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     tools:layout_editor_absoluteX="41dp"
                     tools:layout_editor_absoluteY="141dp" />
 
@@ -282,6 +289,7 @@
                     android:text="@string/no_val"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     tools:layout_editor_absoluteX="41dp"
                     tools:layout_editor_absoluteY="141dp" />
 

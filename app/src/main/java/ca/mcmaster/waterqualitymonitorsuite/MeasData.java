@@ -220,7 +220,7 @@ class MeasData {
         //Cl_Cal_lvl = level (in ppm) when f_i is 0
         //Cl_Sens = current / ppm slope
 
-        k = 0.57;
+        k = 1.0;
         f_i = i - Cl_Cal_i;
 
         result = k*(f_i/Cl_Sens) + Cl_Cal_lvl;
