@@ -68,7 +68,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     private static final int VIEW_CAL = 1;
     private static final boolean INCLUDE_STATS = false;
 
-    private static final double CL_MEAS_THRESHOLD = 40.0;
+    private static final double CL_MEAS_THRESHOLD = 70.0;
 
     public static final int MAX_READ_LINE_LEN = 50; //Maximum expected size in chars per msg
     private static final String TITLE_HEADER = "Water Quality Monitor Results"; //Exported file header title
@@ -1339,9 +1339,15 @@ public class MeasurementActivity extends AppCompatActivity implements
                     if (CurrClValid) {
                         tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
                         tvCurrentVals[i].setTextSize(24);
+                        if((double)m.getValue(i) >= 0.1 && (double)m.getValue(i) <= 4.0){
+                            tvCurrentVals[i].setTextColor(Color.GREEN);
+                        } else {
+                            tvCurrentVals[i].setTextColor(Color.BLACK);
+                        }
                     } else if (!ValidClRecorded){
                         tvCurrentVals[i].setText(getResources().getString(R.string.cl_not_valid));
                         tvCurrentVals[i].setTextSize(10);
+                        tvCurrentVals[i].setTextColor(Color.BLACK);
                     }
                 }
             }
@@ -1361,9 +1367,15 @@ public class MeasurementActivity extends AppCompatActivity implements
                         if (CurrClValid) {
                             tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) avg[i]));
                             tvAvgVals[i].setTextSize(24);
+                            if(avg[i] >= 0.1 && avg[i] <= 4.0){
+                                tvAvgVals[i].setTextColor(Color.GREEN);
+                            } else {
+                                tvAvgVals[i].setTextColor(Color.BLACK);
+                            }
                         } else if (!ValidClRecorded) {
                             tvAvgVals[i].setText(getResources().getString(R.string.cl_not_valid));
                             tvAvgVals[i].setTextSize(10);
+                            tvAvgVals[i].setTextColor(Color.BLACK);
                         }
                     }
                 }
