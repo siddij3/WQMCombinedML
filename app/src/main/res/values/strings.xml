@@ -66,6 +66,7 @@
     <string name="lbl_temp">Temp. (&#176;C)</string>
     <string name="lbl_ph">pH Level</string>
     <string name="lbl_chlorine">Free Cl (ppm)</string>
+    <string name="lbl_alk">Alk</string>
     <string name="lbl_current">Current:</string>
     <string name="lbl_average">Average:</string>
     <string name="no_val">-</string>
@@ -73,7 +74,7 @@
 
     <string name="lbl_tempRaw">Temp.(mV)</string>
     <string name="lbl_phRaw">pH (mV)</string>
-    <string name="lbl_chlorineRaw">Free Cl(nA)</string>
+    <string name="lbl_chlorineRaw">Free Cl (nA)</string>
     <string name="lbl_rawVal">Raw Values:</string>
 
     <string name="lbl_mV">mV</string>
