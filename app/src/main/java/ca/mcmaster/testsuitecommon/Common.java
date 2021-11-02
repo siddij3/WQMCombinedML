@@ -72,7 +72,10 @@ public class Common {
                     Log.d(TAG,uuid + " has notify characteristic");
                 }
                 if ((charaProp | BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
-                    Log.d(TAG,uuid + " has write characteristic");
+                    Log.d(TAG,uuid + " has writD/DeviceScanActivity: onResume: here
+D/DeviceScanActivity: onResume: here
+W/BleActivity: Fine location access not granted!
+D/DeviceScanActivity: onResume: heree characteristic");
                 }
 
                 if(currentCharaData.containsValue(GattAttributes.BLE_SHIELD_CHANNEL)){

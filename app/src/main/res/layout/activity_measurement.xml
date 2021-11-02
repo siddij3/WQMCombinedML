@@ -449,7 +449,7 @@
                 app:lineLabelTextSizeBottom="10sp"
                 app:lineLabelTextSizeLeft="9sp"
                 app:lineLabels="left|bottom"
-                app:rangeTitle="@string/lbl_chlorine"
+                app:rangeTitle="@string/lbl_alk"
                 app:title="" />
 
             <Space

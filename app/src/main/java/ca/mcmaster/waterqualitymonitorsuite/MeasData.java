@@ -18,12 +18,14 @@ class MeasData {
     final static int CALC_TEMPERATURE = 0;
     final static int CALC_PH = 1;
     final static int CALC_CL = 2;
-    final static int RAW_TEMPERATURE = 3;
-    final static int RAW_VOLTAGE = 4;
-    final static int RAW_CURRENT = 5;
-    final static int TIME_STAMP = 6;
-    final static int CL_SW = 7;
-    final static int SW_TIME = 8;
+    final static int RAW_ALK = 3;
+    final static int RAW_TEMPERATURE = 4;
+    final static int RAW_VOLTAGE = 5;
+    final static int RAW_CURRENT = 6;
+    final static int TIME_STAMP = 7;
+    final static int CL_SW = 8;
+    final static int SW_TIME = 9;
+
 
     private final static double BASE_SENS_PH = 60.0; //60.6
     private final static double BASE_SENS_CL = 342.0;
@@ -35,6 +37,11 @@ class MeasData {
     private double tCal, tSens; //Calibration values for T calculation
     private double temperature, phValue, chlorineValue; //Calculated temperature, pH, and free Cl
     private double rawT, rawE, rawI; //Raw values for temperature, voltage (pH), current (Cl)
+
+    private double rawA; //Raw value for alkalinity
+    private double measTimeAlk;
+    private boolean swOnAlk;
+
     private double measTime; // free Cl measurement time
     private boolean swOn; // free Cl measurement switch on
     private String timeStamp; //time stamp for recorded measurement
@@ -241,6 +248,8 @@ class MeasData {
                 return phValue;
             case CALC_CL:
                 return chlorineValue;
+            case RAW_ALK:
+                return rawA;
             case RAW_TEMPERATURE:
                 return rawT;
             case RAW_VOLTAGE:

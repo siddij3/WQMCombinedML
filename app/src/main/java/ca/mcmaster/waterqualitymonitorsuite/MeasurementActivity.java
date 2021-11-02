@@ -121,9 +121,9 @@ public class MeasurementActivity extends AppCompatActivity implements
     private View viewButtons_pH;
     private View viewButtons_T;
 
-    private TextView[] tvCurrentVals = new TextView[6];
-    private TextView[] tvAvgVals = new TextView[7];
-    private TextView[] tvStats = new TextView[7];
+    private TextView[] tvCurrentVals = new TextView[8];
+    private TextView[] tvAvgVals = new TextView[9];
+    private TextView[] tvStats = new TextView[7]; // TODO may have to add more here
 
     private TextView[] tvCalpHLbl = new TextView[3];
     private TextView[] tvCalTLbl = new TextView[3];
@@ -137,10 +137,13 @@ public class MeasurementActivity extends AppCompatActivity implements
     private XYPlot measPlot_T;
     private XYPlot measPlot_Cl;
     private XYPlot measPlot_pH;
+    private XYPlot measPlot_alk;
+
 
     private XYSeries measPlotSeries_T;
     private XYSeries measPlotSeries_Cl;
     private XYSeries measPlotSeries_pH;
+    private XYSeries measPlotSeries_alk;
 
     //Array list for storing measurements
     private List<MeasData> measList = new ArrayList<>();
@@ -153,6 +156,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     //Stored mean voltage and status for calibration
     double averageCalVoltage_pH;
     double averageCalVoltage_t;
+    double averageCalVoltage_alk;
     boolean averageCalVoltageValid;
 
     //Preference/Settings display
@@ -177,6 +181,11 @@ public class MeasurementActivity extends AppCompatActivity implements
     private double ClCalSlope;
     private double ClCalOffset;
     private double ClCalLevel; // free Cl ppm corresponding to Cl Offset value
+
+    // Temp in the event that alkalinity measurements needs more
+    private double alkCalSlope;
+    private double alkCalOffset;
+    private double alkCalLevel; // free Cl ppm corresponding to Cl Offset value
 
 
     //Timer functionality, used only for demo mode to simulate samples
@@ -247,17 +256,20 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvCurrentVals[0] = (TextView) findViewById(R.id.val_currentTemp);
         tvCurrentVals[1] = (TextView) findViewById(R.id.val_currentPh);
         tvCurrentVals[2] = (TextView) findViewById(R.id.val_currentCl);
-        tvCurrentVals[3] = (TextView) findViewById(R.id.val_TempRaw);
-        tvCurrentVals[4] = (TextView) findViewById(R.id.val_PhRaw);
-        tvCurrentVals[5] = (TextView) findViewById(R.id.val_ClRaw);
+        tvCurrentVals[3] = (TextView) findViewById(R.id.val_currentAlk);
+        tvCurrentVals[4] = (TextView) findViewById(R.id.val_TempRaw);
+        tvCurrentVals[5] = (TextView) findViewById(R.id.val_PhRaw);
+        tvCurrentVals[6] = (TextView) findViewById(R.id.val_ClRaw);
 
         tvAvgVals[0] = (TextView) findViewById(R.id.val_avgTemp);
         tvAvgVals[1] = (TextView) findViewById(R.id.val_avgPh);
         tvAvgVals[2] = (TextView) findViewById(R.id.val_avgCl);
-        tvAvgVals[3] = (TextView) findViewById(R.id.val_avgPhRaw_Adv);
-        tvAvgVals[4] = (TextView) findViewById(R.id.val_avgPhRaw);
-        tvAvgVals[5] = (TextView) findViewById(R.id.val_avgTRaw_Adv);
-        tvAvgVals[6] = (TextView) findViewById(R.id.val_avgTRaw);
+        tvAvgVals[3] = (TextView) findViewById(R.id.val_avgAlk);
+
+        tvAvgVals[4] = (TextView) findViewById(R.id.val_avgPhRaw_Adv);
+        tvAvgVals[5] = (TextView) findViewById(R.id.val_avgPhRaw);
+        tvAvgVals[6] = (TextView) findViewById(R.id.val_avgTRaw_Adv);
+        tvAvgVals[7] = (TextView) findViewById(R.id.val_avgTRaw);
 
 
         tvSamples = (TextView) findViewById(R.id.val_Samples);
@@ -298,6 +310,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvCalTLbl[0] = findViewById(R.id.lblStats_T);
         tvCalTLbl[1] = findViewById(R.id.lblavgRawT);
         tvCalTLbl[2] = findViewById(R.id.lblavgRawT_Adv);
+        //TODO is it needed to add alkalinity calibration?
 
         viewButtons_pH = findViewById(R.id.calButtons_pH);
         viewButtons_T = findViewById(R.id.calButtons_T);
@@ -335,6 +348,11 @@ public class MeasurementActivity extends AppCompatActivity implements
         measPlot_Cl.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
         measPlotSeries_Cl = new SimpleXYSeries("Free Cl");
         measPlot_Cl.addSeries(measPlotSeries_Cl, new LineAndPointFormatter(Color.RED, null, null, null));
+
+        measPlot_alk = (XYPlot) findViewById(R.id.measPlot_Alk);
+        measPlot_alk.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("#.00"));
+        measPlotSeries_alk = new SimpleXYSeries("Alkalinity");
+        measPlot_alk.addSeries(measPlotSeries_alk, new LineAndPointFormatter(Color.GREEN, null, null, null));
 
 
         //pH7 calibrate button and click listener
@@ -743,13 +761,19 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvCalpHLbl[0].setVisibility(phVis);
         tvCalpHLbl[1].setVisibility(phVis);
         tvCalpHLbl[2].setVisibility(phVis);
-        tvAvgVals[3].setVisibility(phVis); //avg ph raw adv
-        tvAvgVals[4].setVisibility(phVis); //avg ph raw
+
+        tvAvgVals[4].setVisibility(phVis); //avg ph raw adv
+        tvAvgVals[5].setVisibility(phVis); //avg ph raw
+
         tvCalTLbl[0].setVisibility(tVis);
         tvCalTLbl[1].setVisibility(tVis);
         tvCalTLbl[2].setVisibility(tVis);
-        tvAvgVals[5].setVisibility(tVis); //avg t raw adv
-        tvAvgVals[6].setVisibility(tVis); //avg t raw
+
+        tvAvgVals[6].setVisibility(tVis); //avg t raw adv
+        tvAvgVals[7].setVisibility(tVis); //avg t raw
+
+        //TODO where would alkalinity go here?
+
         viewButtons_pH.setVisibility(phVis);
         viewButtons_T.setVisibility(tVis);
     }
@@ -875,6 +899,7 @@ public class MeasurementActivity extends AppCompatActivity implements
 
 
                 //add data to form string, if NL encountered parse and update data
+                //TODO I believe i parse the data here and include the alkalinity sensor stuff
                 for (byte b:
                         data) {
                     if((char)b == '\n'){
@@ -1218,6 +1243,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
 
     //Update data utlizing switched free Cl measurements
+    // TODO add parameters to include the alkalinity sensor
     private boolean updateDataSwCl(double t, double e, double i, double tMeas, boolean swOn){
         boolean success;
         double avgValues[] = new double[5];
@@ -1288,6 +1314,10 @@ public class MeasurementActivity extends AppCompatActivity implements
 
         updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_CL),
                 (SimpleXYSeries)measPlotSeries_Cl, measPlot_Cl);
+
+        updateChartSeries(getDoubleFromMeasList(1800, MeasData.RAW_ALK),
+                (SimpleXYSeries)measPlotSeries_alk, measPlot_alk);
+
         return success;
     }
 
@@ -1332,6 +1362,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                 ValidClRecorded = true;
             }
             //update current values
+            //TODO: what's teh 4 for?
             for (int i = 0; i < 4; i++) {
                 if(i != MeasData.CALC_CL) {
                     tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
@@ -1494,8 +1525,8 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
 
     private boolean calcAverages(double[] avg, int samples){
-        double scratch[] = new double[] {0.0,0.0,0.0,0.0,0.0}; // scratch double array for calculating sum
-        if (avg.length != 5){//invalid array length
+        double scratch[] = new double[] {0.0,0.0,0.0,0.0,0.0, 0.0}; // scratch double array for calculating sum
+        if (avg.length != 6){//invalid array length
             Log.e(TAG, "calcAverages: Invalid array size");
             return false;
         }
@@ -1506,14 +1537,18 @@ public class MeasurementActivity extends AppCompatActivity implements
                     scratch[0] = scratch[0] + (double)measList.get(s-i-1).getValue(MeasData.CALC_TEMPERATURE);
                     scratch[1] = scratch[1] + (double)measList.get(s-i-1).getValue(MeasData.CALC_PH);
                     scratch[2] = scratch[2] + (double)measList.get(s-i-1).getValue(MeasData.CALC_CL);
-                    scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
-                    scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
+                    scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.RAW_ALK);
+                    scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
+                    scratch[5] = scratch[5] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
+                    //TODO add alkalinity here
+
                 }
                 avg[0] = scratch[0]/samples;
                 avg[1] = scratch[1]/samples;
                 avg[2] = scratch[2]/samples;
                 avg[3] = scratch[3]/samples;
                 avg[4] = scratch[4]/samples;
+                avg[5] = scratch[5]/samples;
             } catch (Exception e){
                 Log.e(TAG, "calcAverages: Exception occurred: " +e.toString());
                 return false;
@@ -1538,6 +1573,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                 "Temp.(C)",
                 "pH Level",
                 "Free Cl (ppm)",
+                "Alkalinity (ppm)",
                 "pH (mV)",
                 "Free Cl (nA)",
                 "Interval Time",
@@ -1615,6 +1651,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                         md.getValue(MeasData.CALC_TEMPERATURE),
                         md.getValue(MeasData.CALC_PH),
                         md.getValue(MeasData.CALC_CL),
+                        md.getValue(MeasData.RAW_ALK),
                         md.getValue(MeasData.RAW_VOLTAGE),
                         md.getValue(MeasData.RAW_CURRENT),
                         //free Cl sw meas info
@@ -1631,6 +1668,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                         md.getValue(MeasData.CALC_TEMPERATURE),
                         md.getValue(MeasData.CALC_PH),
                         md.getValue(MeasData.CALC_CL),
+                        md.getValue(MeasData.RAW_ALK),
                         md.getValue(MeasData.RAW_VOLTAGE),
                         md.getValue(MeasData.RAW_CURRENT),
                         //free Cl sw meas info
