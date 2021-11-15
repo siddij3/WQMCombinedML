@@ -18,13 +18,14 @@ class MeasData {
     final static int CALC_TEMPERATURE = 0;
     final static int CALC_PH = 1;
     final static int CALC_CL = 2;
-    final static int RAW_ALK = 3;
+    final static int CALC_ALK = 3;
     final static int RAW_TEMPERATURE = 4;
     final static int RAW_VOLTAGE = 5;
-    final static int RAW_CURRENT = 6;
-    final static int TIME_STAMP = 7;
-    final static int CL_SW = 8;
-    final static int SW_TIME = 9;
+    final static int RAW_ALK = 6;
+    final static int RAW_CURRENT = 7;
+    final static int TIME_STAMP = 8;
+    final static int CL_SW = 9;
+    final static int SW_TIME = 10;
 
 
     private final static double BASE_SENS_PH = 60.0; //60.6
@@ -50,10 +51,12 @@ class MeasData {
     private double pH_stats[];
     private double t_stats[];
 
-    MeasData(double rawT, double rawE, double rawI, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens){
+    MeasData(double rawT, double rawE, double rawI, double rawA, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens){
         this.rawT = rawT;
         this.rawE = rawE;
         this.rawI = rawI;
+        this.rawA = rawA;
+
         this.phCal7 = phCal7;
         this.phSensLo = phSensLo;
         this.phSensHi = phSensHi;
@@ -77,10 +80,12 @@ class MeasData {
         t_stats = new double[5];
     }
     //Meas data calculation currently used
-    MeasData(double rawT, double rawE, double rawI, double measTime, boolean swOn, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens, double Cl_Cal_i, double Cl_Cal_lvl, double Cl_Sens){
+    MeasData(double rawT, double rawE, double rawI, double rawA, double measTime, boolean swOn, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens, double Cl_Cal_i, double Cl_Cal_lvl, double Cl_Sens){
         this.rawT = rawT;
         this.rawE = rawE;
         this.rawI = rawI;
+        this.rawA = rawA;
+
         this.phCal7 = phCal7;
         this.phSensLo = phSensLo;
         this.phSensHi = phSensHi;

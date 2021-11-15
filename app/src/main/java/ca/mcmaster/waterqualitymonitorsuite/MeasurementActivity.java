@@ -69,6 +69,8 @@ public class MeasurementActivity extends AppCompatActivity implements
     private static final boolean INCLUDE_STATS = false;
 
     private static final double CL_MEAS_THRESHOLD = 70.0;
+    private static final double ALK_MEAS_THRESHOLD = 70.0; //TODO Find threshold for alkalinity
+
 
     public static final int MAX_READ_LINE_LEN = 50; //Maximum expected size in chars per msg
     private static final String TITLE_HEADER = "Water Quality Monitor Results"; //Exported file header title
@@ -82,11 +84,13 @@ public class MeasurementActivity extends AppCompatActivity implements
     private static final double[] DEMO_PH_E = {499.767,494.1002,488.4335,484.8969,481.3604,479.1831,477.0058,475.5385,474.0713,473.2279,472.3846,471.5623,470.74,469.6049,468.4698,467.9539,467.4381,467.0957,466.7533,466.3692,465.9851,465.7744,465.5636,465.3774,465.1912,464.9209,464.6506,464.4131,464.1756,463.9541,463.7327,463.6017,463.4708,463.3505,463.2302,463.1743,463.1185,463.0234,462.9283,462.9125,462.8968,462.8779,462.859,462.8424,462.8257,462.8082,462.7907,462.7723,462.7539,462.7413,462.7287,462.716,462.7033,462.6885,462.6737,462.6591,462.6445,462.6355,462.6266,462.6113,462.6113};
     //Cl data in nA
     private static final double[] DEMO_CL_I = {-3218.89,-2281.19,-2218.72,-2156.26,-1906.39,-1728.15,-1653.15,-1584.41,-1528.14,-1471.9,-1443.46,-1402.83,-1365.96,-1333.46,-1303.46,-1274.71,-1248.46,-1224.71,-1202.83,-1179.71,-1159.08,-1139.08,-1120.95,-1105.33,-1089.7,-1074.7,-1060.33,-1046.58,-1032.83,-1020.33,-1008.45,-997.828,-986.577,-975.327,-963.452,-952.202,-944.703,-935.951,-927.827,-919.076,-911.577,-903.451,-895.326,-886.576,-880.326,-873.612,-867.2389,-861.2067,-855.5155,-850.1652,-845.1558,-840.4874,-836.1598,-832.1733,-828.5276,-825.2229,-822.2591,-819.6362,-817.3543,-815.4133,-815.4133};
+    private static final double[] DEMO_ALK_I = {-3218.89,-2281.19,-2218.72,-2156.26,-1906.39,-1728.15,-1653.15,-1584.41,-1528.14,-1471.9,-1443.46,-1402.83,-1365.96,-1333.46,-1303.46,-1274.71,-1248.46,-1224.71,-1202.83,-1179.71,-1159.08,-1139.08,-1120.95,-1105.33,-1089.7,-1074.7,-1060.33,-1046.58,-1032.83,-1020.33,-1008.45,-997.828,-986.577,-975.327,-963.452,-952.202,-944.703,-935.951,-927.827,-919.076,-911.577,-903.451,-895.326,-886.576,-880.326,-873.612,-867.2389,-861.2067,-855.5155,-850.1652,-845.1558,-840.4874,-836.1598,-832.1733,-828.5276,-825.2229,-822.2591,-819.6362,-817.3543,-815.4133,-815.4133};
 
     private int activeView;
     private SharedPreferences sharedPrefs;
 
     private boolean ValidClRecorded; //atleast one valid Cl measurement obtained since starting measurement
+    private boolean ValidAlkRecorded; //atleast one valid Cl measurement obtained since starting measurement
     private boolean calpHViewActive;
     private boolean measuring;
     private int readFails;
@@ -204,7 +208,7 @@ public class MeasurementActivity extends AppCompatActivity implements
 
             Random rand = new Random();
 
-            double t, e, i;
+            double t, e, i, alk;
             double m, x, b;
 
             //generate ramp up, ramp down, and flat section
@@ -225,10 +229,11 @@ public class MeasurementActivity extends AppCompatActivity implements
             t = 436.9 + 0.06*(rand.nextDouble()*2-1);
             e = DEMO_PH_E[seconds];
             i = DEMO_CL_I[seconds];
+            alk = DEMO_ALK_I[seconds];
             //e = -50.0 + 0.02*(m*x+b) + 0.03*(rand.nextDouble()*2-1);
             //i = 500.0 + 0.04*(m*x+b) + 0.06*(rand.nextDouble()*2-1);
 
-            updateDataSwCl(t, e,  i,(double)seconds, seconds>50);
+            updateDataSwCl(t, e,  i, alk, (double)seconds, seconds>50);
             timerHandler.postDelayed(this, 1000);
 
         }
@@ -795,6 +800,7 @@ public class MeasurementActivity extends AppCompatActivity implements
             measuring = false;
         }
         ValidClRecorded = false;
+        ValidAlkRecorded = false;
         setActionBarSubtitle();
     }
 
@@ -904,11 +910,11 @@ public class MeasurementActivity extends AppCompatActivity implements
                         data) {
                     if((char)b == '\n'){
                         if (sbRead.length() <= MAX_READ_LINE_LEN){
-                            double[] d = new double[5];
+                            double[] d = new double[6];
                             if(parseDataSwCl(sbRead,d)) {
                                 readFails = 0;
                                 if (measuring)
-                                    updateDataSwCl(d[0],d[1],d[2],d[3],d[4]>0.5);
+                                    updateDataSwCl(d[0],d[1],d[2],d[3], d[4], d[5]>0.5);
                             } else {
                                 //parse failed, if three consecutive fails prompt user
                                 readFails++;
@@ -1169,12 +1175,12 @@ public class MeasurementActivity extends AppCompatActivity implements
         return (c=='.');
     }
 
-    private boolean updateData(double t, double e, double i){
+    private boolean updateData(double t, double e, double i, double alk){
         boolean success;
         double avgValues[] = new double[5];
         double pH_stats[] = new double[5];
         double t_stats[] = new double[5];
-        MeasData m = new MeasData(t,e,i,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope);
+        MeasData m = new MeasData(t,e,i,alk, phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope);
         measList.add(m);
 
         if(measList.size() > maxSampleSize)
@@ -1239,17 +1245,22 @@ public class MeasurementActivity extends AppCompatActivity implements
 
         updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_CL),
                 (SimpleXYSeries)measPlotSeries_Cl, measPlot_Cl);
+
+        updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_ALK),
+                (SimpleXYSeries)measPlotSeries_alk, measPlot_alk);
+
+
         return success;
     }
 
     //Update data utlizing switched free Cl measurements
     // TODO add parameters to include the alkalinity sensor
-    private boolean updateDataSwCl(double t, double e, double i, double tMeas, boolean swOn){
+    private boolean updateDataSwCl(double t, double e, double i, double a, double tMeas, boolean swOn){
         boolean success;
         double avgValues[] = new double[5];
         double pH_stats[] = new double[5];
         double t_stats[] = new double[5];
-        MeasData m = new MeasData(t,e,i,tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope);
+        MeasData m = new MeasData(t,e,i,a, tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope);
         measList.add(m);
 
         if(measList.size() > maxSampleSize)
@@ -1315,7 +1326,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_CL),
                 (SimpleXYSeries)measPlotSeries_Cl, measPlot_Cl);
 
-        updateChartSeries(getDoubleFromMeasList(1800, MeasData.RAW_ALK),
+        updateChartSeries(getDoubleFromMeasList(1800, MeasData.CALC_ALK),
                 (SimpleXYSeries)measPlotSeries_alk, measPlot_alk);
 
         return success;
@@ -1358,11 +1369,15 @@ public class MeasurementActivity extends AppCompatActivity implements
     private boolean refreshDisplayValues(boolean updateAvg, double[] avg, MeasData m) {
         try {
             boolean CurrClValid = (double)m.getValue(MeasData.SW_TIME) > CL_MEAS_THRESHOLD;
+            boolean CurrAlkValid = (double)m.getValue(MeasData.SW_TIME) > ALK_MEAS_THRESHOLD;
+
             if(CurrClValid){
                 ValidClRecorded = true;
             }
+
             //update current values
             //TODO: what's teh 4 for?
+            //TODO: Split the alkalinity as well?
             for (int i = 0; i < 4; i++) {
                 if(i != MeasData.CALC_CL) {
                     tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
@@ -1411,11 +1426,11 @@ public class MeasurementActivity extends AppCompatActivity implements
                     }
                 }
                 //format pH voltage avg with one decimal place
-                tvAvgVals[3].setText(String.format(Locale.CANADA,"%.1f", avg[3])); //ph V Avg, advanced calib. screen
-                tvAvgVals[4].setText(String.format(Locale.CANADA,"%.1f", avg[3])); //ph V Avg, standard calib. screen
+                tvAvgVals[3].setText(String.format(Locale.CANADA,"%.1f", avg[5])); //ph V Avg, advanced calib. screen
+                tvAvgVals[4].setText(String.format(Locale.CANADA,"%.1f", avg[5])); //ph V Avg, standard calib. screen
                 //format temp voltage avg with one decimal place
-                tvAvgVals[5].setText(String.format(Locale.CANADA,"%.1f", avg[4])); //t V Avg, advanced calib. screen
-                tvAvgVals[6].setText(String.format(Locale.CANADA,"%.1f", avg[4])); //t V Avg, standard calib. screen
+                tvAvgVals[5].setText(String.format(Locale.CANADA,"%.1f", avg[6])); //t V Avg, advanced calib. screen
+                tvAvgVals[6].setText(String.format(Locale.CANADA,"%.1f", avg[6])); //t V Avg, standard calib. screen
             } else {
                 // clear average values
                 for (int i = 0; i < 6; i++) {
@@ -1525,8 +1540,8 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
 
     private boolean calcAverages(double[] avg, int samples){
-        double scratch[] = new double[] {0.0,0.0,0.0,0.0,0.0, 0.0}; // scratch double array for calculating sum
-        if (avg.length != 6){//invalid array length
+        double scratch[] = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // scratch double array for calculating sum
+        if (avg.length != 7){//invalid array length
             Log.e(TAG, "calcAverages: Invalid array size");
             return false;
         }
@@ -1537,9 +1552,10 @@ public class MeasurementActivity extends AppCompatActivity implements
                     scratch[0] = scratch[0] + (double)measList.get(s-i-1).getValue(MeasData.CALC_TEMPERATURE);
                     scratch[1] = scratch[1] + (double)measList.get(s-i-1).getValue(MeasData.CALC_PH);
                     scratch[2] = scratch[2] + (double)measList.get(s-i-1).getValue(MeasData.CALC_CL);
-                    scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.RAW_ALK);
+                    scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.CALC_ALK);
                     scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
                     scratch[5] = scratch[5] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
+                    scratch[6] = scratch[6] + (double)measList.get(s-i-1).getValue(MeasData.RAW_ALK);
                     //TODO add alkalinity here
 
                 }
@@ -1549,6 +1565,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                 avg[3] = scratch[3]/samples;
                 avg[4] = scratch[4]/samples;
                 avg[5] = scratch[5]/samples;
+                avg[6] = scratch[6]/samples;
             } catch (Exception e){
                 Log.e(TAG, "calcAverages: Exception occurred: " +e.toString());
                 return false;
@@ -1651,9 +1668,10 @@ public class MeasurementActivity extends AppCompatActivity implements
                         md.getValue(MeasData.CALC_TEMPERATURE),
                         md.getValue(MeasData.CALC_PH),
                         md.getValue(MeasData.CALC_CL),
-                        md.getValue(MeasData.RAW_ALK),
+                        md.getValue(MeasData.CALC_ALK),
                         md.getValue(MeasData.RAW_VOLTAGE),
                         md.getValue(MeasData.RAW_CURRENT),
+                        md.getValue(MeasData.RAW_ALK),
                         //free Cl sw meas info
                         md.getValue(MeasData.SW_TIME),
                         md.getValue(MeasData.CL_SW),

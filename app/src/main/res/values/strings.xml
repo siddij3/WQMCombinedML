@@ -66,7 +66,7 @@
     <string name="lbl_temp">Temp. (&#176;C)</string>
     <string name="lbl_ph">pH Level</string>
     <string name="lbl_chlorine">Free Cl (ppm)</string>
-    <string name="lbl_alk">Alk (ppm)</string>
+    <string name="lbl_alk">Alkalinity (ppm)</string>
     <string name="lbl_current">Current:</string>
     <string name="lbl_average">Average:</string>
     <string name="no_val">-</string>
