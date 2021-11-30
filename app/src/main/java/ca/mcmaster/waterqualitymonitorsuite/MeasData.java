@@ -84,6 +84,7 @@ class MeasData {
         temperature = calcT(rawT);
         phValue = calcPh(rawE, temperature);
         chlorineValue = calcCl(rawI, phValue, temperature);
+        alkalinityValue = calcAlk(rawI, phValue, temperature);
 
         timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.CANADA).format(new Date());
 
@@ -240,6 +241,27 @@ class MeasData {
             result = 0.0;
 
         Log.d(TAG, String.format("calcCl: k: %.3f f_i: %.3f sf_t: %.3f f_t: %.3f f_ph_t: %.3f Cl: %.3f",k,f_i,sf_t,f_t,f_ph_t,result));
+        return result;
+    }
+
+    private double calcAlk(double a, double ph, double t){
+        double k, f_a, sf_t, f_ph_t, f_t, t2, result;
+        Log.d(TAG, String.format("calcCl: i: %.3f ph: %.3f t: %.2f",a,ph,t));
+
+        k = 0.57;
+        f_a = a - Cl_Cal_i;
+        sf_t = Cl_Sens + (t-27) * 9.3;
+        t2 = t + 273;
+        f_t = (3000/t2)-10.0686+(0.0253*t2);
+        f_ph_t = 1 + Math.pow(10,ph - f_t);
+
+        result = k*(f_a/sf_t)*f_ph_t + Cl_Cal_lvl;
+
+        //Set to zero if result is negative (ppm can not be negative)
+        if (result < 0)
+            result = 0.0;
+
+        Log.d(TAG, String.format("calcCl: k: %.3f f_a: %.3f sf_t: %.3f f_t: %.3f f_ph_t: %.3f Cl: %.3f",k,f_a,sf_t,f_t,f_ph_t,result));
         return result;
     }
 

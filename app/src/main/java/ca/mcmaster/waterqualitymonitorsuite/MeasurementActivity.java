@@ -272,10 +272,10 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvAvgVals[2] = (TextView) findViewById(R.id.val_avgCl);
         tvAvgVals[3] = (TextView) findViewById(R.id.val_avgAlk);
 
-        tvAvgVals[4] = (TextView) findViewById(R.id.val_avgPhRaw_Adv);
-        tvAvgVals[5] = (TextView) findViewById(R.id.val_avgPhRaw);
-        tvAvgVals[6] = (TextView) findViewById(R.id.val_avgTRaw_Adv);
-        tvAvgVals[7] = (TextView) findViewById(R.id.val_avgTRaw);
+        tvAvgVals[4] = (TextView) findViewById(R.id.val_avgTRaw_Adv);
+        tvAvgVals[5] = (TextView) findViewById(R.id.val_avgTRaw);
+        tvAvgVals[6] = (TextView) findViewById(R.id.val_avgPhRaw_Adv);
+        tvAvgVals[7] = (TextView) findViewById(R.id.val_avgPhRaw);
 
 
         tvSamples = (TextView) findViewById(R.id.val_Samples);
@@ -784,8 +784,6 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvAvgVals[6].setVisibility(tVis); //avg t raw adv
         tvAvgVals[7].setVisibility(tVis); //avg t raw
 
-        //TODO where would alkalinity go here?
-
         viewButtons_pH.setVisibility(phVis);
         viewButtons_T.setVisibility(tVis);
     }
@@ -1279,13 +1277,6 @@ public class MeasurementActivity extends AppCompatActivity implements
         double t_stats[] = new double[6];
         MeasData m = new MeasData(t,e,i,a, tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope, alkCalOffset, alkCalLevel, alkCalSlope);
 
-        Log.d(TAG, "updateDataSwClAlk: " + ClCalOffset);
-        Log.d(TAG, "updateDataSwClAlk: " + ClCalLevel);
-        Log.d(TAG, "updateDataSwClAlk: " + ClCalSlope);
-        Log.d(TAG, "updateDataSwClAlk: Alk Offset" + alkCalOffset);
-        Log.d(TAG, "updateDataSwClAlk: " + alkCalLevel);
-        Log.d(TAG, "updateDataSwClAlk: " + alkCalSlope);
-
         measList.add(m);
 
         if(measList.size() > maxSampleSize)
@@ -1313,6 +1304,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         // update display with new values, update averages if average calc. successful
         success = refreshDisplayValues(averageCalVoltageValid,avgValues,m);
 
+
         //Update charts
 
         // update calibration chart
@@ -1338,7 +1330,7 @@ public class MeasurementActivity extends AppCompatActivity implements
             updateChartSeries(pH_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
         else
             updateChartSeries(t_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
-
+        Log.d(TAG, "updateDataSwClAlk: See if this function is being called");
         // update measurement charts, max sample size for meas plots = 1800
         // (30 mins @ 1Hz sampling),otherwise interface bogs down. Can be increased
         // if multi-threading is used or code is optimized
@@ -1373,7 +1365,9 @@ public class MeasurementActivity extends AppCompatActivity implements
         int l = (maxLength < measList.size()) ? maxLength : measList.size();
 
         List<Double> values = new ArrayList<>();
+        Log.d(TAG, "getDoubleFromMeasList: measLIst" + measList.toString());
         for (int i = measList.size()-l; i < measList.size(); i++) {
+            Log.d(TAG, "getDoubleFromMeasList: item at index" + measList.get(i).getValue(valIndex) );
             values.add((Double)measList.get(i).getValue(valIndex));
         }
         return values;
@@ -1400,17 +1394,15 @@ public class MeasurementActivity extends AppCompatActivity implements
                 ValidClRecorded = true;
             }
             if(CurrAlkValid){
-                CurrAlkValid = true;
+                ValidAlkRecorded = true;
             }
 
             //update current values
-            //TODO: what's teh 4 for?
-            //TODO: Split the alkalinity as well?
-            for (int i = 0; i < 5; i++) {
-                if(i != MeasData.CALC_CL) {
-                    Log.d(TAG, "refreshDisplayValues: m.getValue" + m.getValue(i));
+            //The 4 is for the different types of measurements: pH (0), T (1), Cl (2), Alk (3)
+            for (int i = 0; i < 4; i++) {
+                if(i != MeasData.CALC_CL && i != MeasData.CALC_ALK) {
                     tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
-                } else {
+                } else if (i == MeasData.CALC_CL){
                     if (CurrClValid) {
                         tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
                         tvCurrentVals[i].setTextSize(24);
@@ -1423,11 +1415,23 @@ public class MeasurementActivity extends AppCompatActivity implements
                         tvCurrentVals[i].setText(getResources().getString(R.string.cl_not_valid));
                         tvCurrentVals[i].setTextSize(10);
                         tvCurrentVals[i].setTextColor(Color.BLACK);
-                    } else if (!ValidAlkRecorded){
+                    }
+                } else { // The condition for when i == MeasData_CALC_ALK
+                    if (CurrAlkValid) {
+                        tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
+                        tvCurrentVals[i].setTextSize(24);
+                        // TODO get the proper ppm values
+                        if((double)m.getValue(i) >= 75 && (double)m.getValue(i) <= 238){
+                            tvCurrentVals[i].setTextColor(Color.GREEN);
+                        } else {
+                            tvCurrentVals[i].setTextColor(Color.BLACK);
+                        }
+                    } else if (!ValidAlkRecorded) {
                         tvCurrentVals[i].setText(getResources().getString(R.string.alk_not_valid));
                         tvCurrentVals[i].setTextSize(10);
                         tvCurrentVals[i].setTextColor(Color.BLACK);
                     }
+
                 }
             }
 
@@ -1439,11 +1443,10 @@ public class MeasurementActivity extends AppCompatActivity implements
 
             if (updateAvg) {
                 //update average values
-                for (int i = 0; i < 3; i++) {
-                    if(i != MeasData.CALC_CL) {
-                        Log.d(TAG, "refreshDisplayValues: Update Average" + avg[i]);
+                for (int i = 0; i < 4; i++) {
+                    if(i != MeasData.CALC_CL && i != MeasData.CALC_ALK) {
                         tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", avg[i]));
-                    } else {
+                    } else if (i == MeasData.CALC_CL) {
                         if (CurrClValid) {
                             tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) avg[i]));
                             tvAvgVals[i].setTextSize(24);
@@ -1457,14 +1460,29 @@ public class MeasurementActivity extends AppCompatActivity implements
                             tvAvgVals[i].setTextSize(10);
                             tvAvgVals[i].setTextColor(Color.BLACK);
                         }
+                    } else if (i == MeasData.CALC_ALK) {
+                        if (CurrAlkValid) {
+                            tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) avg[i]));
+                            tvAvgVals[i].setTextSize(24);
+                            if(avg[i] >= 0.1 && avg[i] <= 4.0){
+                                tvAvgVals[i].setTextColor(Color.GREEN);
+                            } else {
+                                tvAvgVals[i].setTextColor(Color.BLACK);
+                            }
+                        } else if (!ValidAlkRecorded) {
+                            tvAvgVals[i].setText(getResources().getString(R.string.alk_not_valid));
+                            tvAvgVals[i].setTextSize(10);
+                            tvAvgVals[i].setTextColor(Color.BLACK);
+                        }
                     }
                 }
                 //format pH voltage avg with one decimal place
-                tvAvgVals[3].setText(String.format(Locale.CANADA,"%.1f", avg[5])); //ph V Avg, advanced calib. screen
-                tvAvgVals[4].setText(String.format(Locale.CANADA,"%.1f", avg[5])); //ph V Avg, standard calib. screen
+                tvAvgVals[4].setText(String.format(Locale.CANADA,"%.1f", avg[4])); //ph V Avg, advanced calib. screen
+                tvAvgVals[5].setText(String.format(Locale.CANADA,"%.1f", avg[4])); //ph V Avg, standard calib. screen
                 //format temp voltage avg with one decimal place
-                tvAvgVals[5].setText(String.format(Locale.CANADA,"%.1f", avg[6])); //t V Avg, advanced calib. screen
-                tvAvgVals[6].setText(String.format(Locale.CANADA,"%.1f", avg[6])); //t V Avg, standard calib. screen
+                tvAvgVals[6].setText(String.format(Locale.CANADA,"%.1f", avg[5])); //t V Avg, advanced calib. screen
+                tvAvgVals[7].setText(String.format(Locale.CANADA,"%.1f", avg[5])); //t V Avg, standard calib. screen
+
             } else {
                 // clear average values
                 for (int i = 0; i < 6; i++) {
@@ -1589,8 +1607,8 @@ public class MeasurementActivity extends AppCompatActivity implements
                     scratch[1] = scratch[1] + (double)measList.get(s-i-1).getValue(MeasData.CALC_PH);
                     scratch[2] = scratch[2] + (double)measList.get(s-i-1).getValue(MeasData.CALC_CL);
                     scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.CALC_ALK);
-                    scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
-                    scratch[5] = scratch[5] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
+                    scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
+                    scratch[5] = scratch[5] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
                         //TODO add alkalinity here
 
                     }
@@ -1600,7 +1618,6 @@ public class MeasurementActivity extends AppCompatActivity implements
                 avg[3] = scratch[3]/samples;
                 avg[4] = scratch[4]/samples;
                 avg[5] = scratch[5]/samples;
-                Log.d(TAG, "calcAverages: Average" + Arrays.toString(avg));
             } catch (Exception e){
                 Log.e(TAG, "calcAverages: Exception occurred: " +e.toString());
                 return false;
