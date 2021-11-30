@@ -233,7 +233,7 @@ public class MeasurementActivity extends AppCompatActivity implements
             //e = -50.0 + 0.02*(m*x+b) + 0.03*(rand.nextDouble()*2-1);
             //i = 500.0 + 0.04*(m*x+b) + 0.06*(rand.nextDouble()*2-1);
 
-            updateDataSwCl(t, e,  i, alk, (double)seconds, seconds>50);
+            updateDataSwClAlk(t, e,  i, alk, (double)seconds, seconds>50);
             timerHandler.postDelayed(this, 1000);
 
         }
@@ -265,6 +265,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvCurrentVals[4] = (TextView) findViewById(R.id.val_TempRaw);
         tvCurrentVals[5] = (TextView) findViewById(R.id.val_PhRaw);
         tvCurrentVals[6] = (TextView) findViewById(R.id.val_ClRaw);
+        tvCurrentVals[7] = (TextView) findViewById(R.id.val_AlkRaw);
 
         tvAvgVals[0] = (TextView) findViewById(R.id.val_avgTemp);
         tvAvgVals[1] = (TextView) findViewById(R.id.val_avgPh);
@@ -724,6 +725,12 @@ public class MeasurementActivity extends AppCompatActivity implements
         ClCalOffset = Double.parseDouble(sharedPrefs.getString("pref_cal_cl_offset",Prefs.DEF_CLCALOFFSET));
         ClCalSlope = Double.parseDouble(sharedPrefs.getString("pref_cal_cl_slope",Prefs.DEF_CLCALSLOPE));
         ClCalLevel = Double.parseDouble(sharedPrefs.getString("pref_cal_cl_level",Prefs.DEF_CLCALLEVEL));
+
+        alkCalOffset = Double.parseDouble(sharedPrefs.getString("pref_cal_alk_offset",Prefs.DEF_ALKCALOFFSET));
+        alkCalSlope = Double.parseDouble(sharedPrefs.getString("pref_cal_alk_slope",Prefs.DEF_ALKCALSLOPE));
+        alkCalLevel = Double.parseDouble(sharedPrefs.getString("pref_cal_alk_level",Prefs.DEF_ALKCALLEVEL));
+
+
     }
 
     private void setView(int viewNum){
@@ -903,6 +910,9 @@ public class MeasurementActivity extends AppCompatActivity implements
                 String s = new String(data);
                 Log.d(TAG, "onReceive: " + s);
 
+                // TODO TEMP
+
+
 
                 //add data to form string, if NL encountered parse and update data
                 //TODO I believe i parse the data here and include the alkalinity sensor stuff
@@ -914,7 +924,8 @@ public class MeasurementActivity extends AppCompatActivity implements
                             if(parseDataSwCl(sbRead,d)) {
                                 readFails = 0;
                                 if (measuring)
-                                    updateDataSwCl(d[0],d[1],d[2],d[3], d[4], d[5]>0.5);
+                                    d[3] = d[2];
+                                updateDataSwClAlk(d[0],d[1],d[2],d[3], d[4], d[5]>0.5);
                             } else {
                                 //parse failed, if three consecutive fails prompt user
                                 readFails++;
@@ -1105,7 +1116,7 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     private boolean parseDataSwCl(StringBuilder sb, double[] data){
         Log.d(TAG, "parseData: Parsing string:"+sb.toString());
-        int dataPts = 5; //expected number of data points per string
+        int dataPts = 6; //expected number of data points per string
         StringBuilder[] dataStrings = new StringBuilder[dataPts];
         for (int i = 0; i < dataStrings.length; i++) {
             dataStrings[i] = new StringBuilder();
@@ -1127,7 +1138,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         for (char c:
                 sb.toString().toCharArray()) {
             spaceExpected = index==0 || (index == sb.length()-1);
-            if(spaceExpected && c != ' ') {
+             if(spaceExpected && c != ' ') {
                 //First char not space, invalid data
                 Log.d(TAG, "parseData: Invalid string - space char ' ' expected");
                 return false;
@@ -1154,8 +1165,14 @@ public class MeasurementActivity extends AppCompatActivity implements
         // data parsed into string array, convert and assign to double array
         for (int i = 0; i < dataPts; i++) {
             if (dataStrings[i].length()>0){
-                Log.d(TAG, dataStrings[i].toString());
                 try {
+                    //TODO hot-wiring the alkalinity sensor data
+                    if (i == 3) {
+                        data[3] = data[2];
+                        data[4] = Double.parseDouble(dataStrings[3].toString());
+                        data[5] = Double.parseDouble(dataStrings[4].toString());
+                        break;
+                    }
                     data[i] = Double.parseDouble(dataStrings[i].toString());
                 } catch (Exception e){
                     Log.e(TAG, "parseData: Exception occurred: " +e.toString());
@@ -1186,21 +1203,21 @@ public class MeasurementActivity extends AppCompatActivity implements
         if(measList.size() > maxSampleSize)
             measList.remove(0);
         // calculate average values, return if averaging operation was successful
-        success = calcAverages(avgValues, avgSampleSize);
+        success = true;// calcAverages(avgValues, avgSampleSize);
 
 
         // If averages updated successfully, update average voltage and status
         // (Used for calibration)
         // Also calculate stats over average period
-        if(success){
-            averageCalVoltage_pH = avgValues[3];
-            averageCalVoltage_t = avgValues[4];
+      //  if(success){
+            averageCalVoltage_pH = avgValues[4];
+            averageCalVoltage_t = avgValues[5];
             averageCalVoltageValid = true;
-        } else {
-            averageCalVoltage_pH = 0.0;
-            averageCalVoltage_t = 0.0;
-            averageCalVoltageValid = false;
-        }
+        //} else {
+          //  averageCalVoltage_pH = 0.0;
+           // averageCalVoltage_t = 0.0;
+            //averageCalVoltageValid = false;
+       // }
 
         // Hide or show Cal. buttons based on average calc. success
         updateDisplayCalButton();
@@ -1255,12 +1272,20 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     //Update data utlizing switched free Cl measurements
     // TODO add parameters to include the alkalinity sensor
-    private boolean updateDataSwCl(double t, double e, double i, double a, double tMeas, boolean swOn){
+    private boolean updateDataSwClAlk(double t, double e, double i, double a, double tMeas, boolean swOn){
         boolean success;
-        double avgValues[] = new double[5];
-        double pH_stats[] = new double[5];
-        double t_stats[] = new double[5];
-        MeasData m = new MeasData(t,e,i,a, tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope);
+        double avgValues[] = new double[6];
+        double pH_stats[] = new double[6];
+        double t_stats[] = new double[6];
+        MeasData m = new MeasData(t,e,i,a, tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope, alkCalOffset, alkCalLevel, alkCalSlope);
+
+        Log.d(TAG, "updateDataSwClAlk: " + ClCalOffset);
+        Log.d(TAG, "updateDataSwClAlk: " + ClCalLevel);
+        Log.d(TAG, "updateDataSwClAlk: " + ClCalSlope);
+        Log.d(TAG, "updateDataSwClAlk: Alk Offset" + alkCalOffset);
+        Log.d(TAG, "updateDataSwClAlk: " + alkCalLevel);
+        Log.d(TAG, "updateDataSwClAlk: " + alkCalSlope);
+
         measList.add(m);
 
         if(measList.size() > maxSampleSize)
@@ -1273,8 +1298,8 @@ public class MeasurementActivity extends AppCompatActivity implements
         // (Used for calibration)
         // Also calculate stats over average period
         if(success){
-            averageCalVoltage_pH = avgValues[3];
-            averageCalVoltage_t = avgValues[4];
+            averageCalVoltage_pH = avgValues[4];
+            averageCalVoltage_t = avgValues[5];
             averageCalVoltageValid = true;
         } else {
             averageCalVoltage_pH = 0.0;
@@ -1374,12 +1399,16 @@ public class MeasurementActivity extends AppCompatActivity implements
             if(CurrClValid){
                 ValidClRecorded = true;
             }
+            if(CurrAlkValid){
+                CurrAlkValid = true;
+            }
 
             //update current values
             //TODO: what's teh 4 for?
             //TODO: Split the alkalinity as well?
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 if(i != MeasData.CALC_CL) {
+                    Log.d(TAG, "refreshDisplayValues: m.getValue" + m.getValue(i));
                     tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
                 } else {
                     if (CurrClValid) {
@@ -1390,8 +1419,12 @@ public class MeasurementActivity extends AppCompatActivity implements
                         } else {
                             tvCurrentVals[i].setTextColor(Color.BLACK);
                         }
-                    } else if (!ValidClRecorded){
+                    } else if (!ValidClRecorded) {
                         tvCurrentVals[i].setText(getResources().getString(R.string.cl_not_valid));
+                        tvCurrentVals[i].setTextSize(10);
+                        tvCurrentVals[i].setTextColor(Color.BLACK);
+                    } else if (!ValidAlkRecorded){
+                        tvCurrentVals[i].setText(getResources().getString(R.string.alk_not_valid));
                         tvCurrentVals[i].setTextSize(10);
                         tvCurrentVals[i].setTextColor(Color.BLACK);
                     }
@@ -1408,6 +1441,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                 //update average values
                 for (int i = 0; i < 3; i++) {
                     if(i != MeasData.CALC_CL) {
+                        Log.d(TAG, "refreshDisplayValues: Update Average" + avg[i]);
                         tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", avg[i]));
                     } else {
                         if (CurrClValid) {
@@ -1540,32 +1574,33 @@ public class MeasurementActivity extends AppCompatActivity implements
     }
 
     private boolean calcAverages(double[] avg, int samples){
-        double scratch[] = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // scratch double array for calculating sum
-        if (avg.length != 7){//invalid array length
+        double scratch[] = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // scratch double array for calculating sum
+        if (avg.length != 6){//invalid array length
             Log.e(TAG, "calcAverages: Invalid array size");
             return false;
         }
+
         int s = measList.size();
         if(s >= samples){
             try{
-                for (int i = 0; i < samples; i++) {
+
+                    for (int i = 0; i < samples; i++) {
                     scratch[0] = scratch[0] + (double)measList.get(s-i-1).getValue(MeasData.CALC_TEMPERATURE);
                     scratch[1] = scratch[1] + (double)measList.get(s-i-1).getValue(MeasData.CALC_PH);
                     scratch[2] = scratch[2] + (double)measList.get(s-i-1).getValue(MeasData.CALC_CL);
                     scratch[3] = scratch[3] + (double)measList.get(s-i-1).getValue(MeasData.CALC_ALK);
                     scratch[4] = scratch[4] + (double)measList.get(s-i-1).getValue(MeasData.RAW_VOLTAGE);
                     scratch[5] = scratch[5] + (double)measList.get(s-i-1).getValue(MeasData.RAW_TEMPERATURE);
-                    scratch[6] = scratch[6] + (double)measList.get(s-i-1).getValue(MeasData.RAW_ALK);
-                    //TODO add alkalinity here
+                        //TODO add alkalinity here
 
-                }
+                    }
                 avg[0] = scratch[0]/samples;
                 avg[1] = scratch[1]/samples;
                 avg[2] = scratch[2]/samples;
                 avg[3] = scratch[3]/samples;
                 avg[4] = scratch[4]/samples;
                 avg[5] = scratch[5]/samples;
-                avg[6] = scratch[6]/samples;
+                Log.d(TAG, "calcAverages: Average" + Arrays.toString(avg));
             } catch (Exception e){
                 Log.e(TAG, "calcAverages: Exception occurred: " +e.toString());
                 return false;
@@ -1686,9 +1721,10 @@ public class MeasurementActivity extends AppCompatActivity implements
                         md.getValue(MeasData.CALC_TEMPERATURE),
                         md.getValue(MeasData.CALC_PH),
                         md.getValue(MeasData.CALC_CL),
-                        md.getValue(MeasData.RAW_ALK),
+                        md.getValue(MeasData.CALC_ALK),
                         md.getValue(MeasData.RAW_VOLTAGE),
                         md.getValue(MeasData.RAW_CURRENT),
+                        md.getValue(MeasData.RAW_ALK),
                         //free Cl sw meas info
                         md.getValue(MeasData.SW_TIME),
                         md.getValue(MeasData.CL_SW)

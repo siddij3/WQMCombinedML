@@ -577,6 +577,33 @@
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textStyle="bold" />
 
+                <TextView
+                    android:id="@+id/lblAlkRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="3"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:padding="2dp"
+                    android:text="@string/lbl_alkalinityRaw"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/val_AlkRaw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_gravity="top"
+                    android:layout_marginBottom="4dp"
+                    android:layout_row="1"
+                    android:minWidth="55dp"
+                    android:padding="1dp"
+                    android:text="@string/no_val"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold" />
+
                 <!-- Row 1 -->
                 <TextView
                     android:id="@+id/lblavgpH_Adv"

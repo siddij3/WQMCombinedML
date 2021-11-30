@@ -21,9 +21,14 @@ public class Prefs extends AppCompatActivity {
     public final static String DEF_PHCALSLOPE = "60.6";
     public final static String DEF_TCALSLOPE = "100";
     public final static String DEF_TCALOFFSET = "0";
+
     public final static String DEF_CLCALSLOPE = "342.0";
     public final static String DEF_CLCALOFFSET = "109.6";
     public final static String DEF_CLCALLEVEL = "0.0";
+
+    public final static String DEF_ALKCALSLOPE = "342.0";
+    public final static String DEF_ALKCALOFFSET = "109.6";
+    public final static String DEF_ALKCALLEVEL = "0.0";
 
     //Preference keys for settings not available from UI
     public final static String PREF_T100_VAL = "pref_cal_t100"; //preference key for storing T=100 voltage
