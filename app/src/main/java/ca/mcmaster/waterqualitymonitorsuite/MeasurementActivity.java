@@ -36,6 +36,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -189,7 +190,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     // Temp in the event that alkalinity measurements needs more
     private double alkCalSlope;
     private double alkCalOffset;
-    private double alkCalLevel; // free Cl ppm corresponding to Cl Offset value
+    private double alkCalLevel; // free alkalinity ppm corresponding to alkalinity Offset value
 
 
     //Timer functionality, used only for demo mode to simulate samples
@@ -316,7 +317,6 @@ public class MeasurementActivity extends AppCompatActivity implements
         tvCalTLbl[0] = findViewById(R.id.lblStats_T);
         tvCalTLbl[1] = findViewById(R.id.lblavgRawT);
         tvCalTLbl[2] = findViewById(R.id.lblavgRawT_Adv);
-        //TODO is it needed to add alkalinity calibration?
 
         viewButtons_pH = findViewById(R.id.calButtons_pH);
         viewButtons_T = findViewById(R.id.calButtons_T);
@@ -729,8 +729,6 @@ public class MeasurementActivity extends AppCompatActivity implements
         alkCalOffset = Double.parseDouble(sharedPrefs.getString("pref_cal_alk_offset",Prefs.DEF_ALKCALOFFSET));
         alkCalSlope = Double.parseDouble(sharedPrefs.getString("pref_cal_alk_slope",Prefs.DEF_ALKCALSLOPE));
         alkCalLevel = Double.parseDouble(sharedPrefs.getString("pref_cal_alk_level",Prefs.DEF_ALKCALLEVEL));
-
-
     }
 
     private void setView(int viewNum){
@@ -908,10 +906,6 @@ public class MeasurementActivity extends AppCompatActivity implements
                 String s = new String(data);
                 Log.d(TAG, "onReceive: " + s);
 
-                // TODO TEMP
-
-
-
                 //add data to form string, if NL encountered parse and update data
                 //TODO I believe i parse the data here and include the alkalinity sensor stuff
                 for (byte b:
@@ -919,7 +913,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                     if((char)b == '\n'){
                         if (sbRead.length() <= MAX_READ_LINE_LEN){
                             double[] d = new double[6];
-                            if(parseDataSwCl(sbRead,d)) {
+                            if(parseDataSwClAlk(sbRead,d)) {
                                 readFails = 0;
                                 if (measuring)
                                     d[3] = d[2];
@@ -1112,8 +1106,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         return true;
     }
 
-    private boolean parseDataSwCl(StringBuilder sb, double[] data){
-        Log.d(TAG, "parseData: Parsing string:"+sb.toString());
+    private boolean parseDataSwClAlk(StringBuilder sb, double[] data){
         int dataPts = 6; //expected number of data points per string
         StringBuilder[] dataStrings = new StringBuilder[dataPts];
         for (int i = 0; i < dataStrings.length; i++) {
@@ -1169,6 +1162,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                         data[3] = data[2];
                         data[4] = Double.parseDouble(dataStrings[3].toString());
                         data[5] = Double.parseDouble(dataStrings[4].toString());
+                        Log.d(TAG, "parseDataSwClAlk: Received array as a string: " + Arrays.toString(data));
                         break;
                     }
                     data[i] = Double.parseDouble(dataStrings[i].toString());
@@ -1268,8 +1262,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         return success;
     }
 
-    //Update data utlizing switched free Cl measurements
-    // TODO add parameters to include the alkalinity sensor
+    //Update data utlizing switched free Cl and alkalinity measurements
     private boolean updateDataSwClAlk(double t, double e, double i, double a, double tMeas, boolean swOn){
         boolean success;
         double avgValues[] = new double[6];
@@ -1330,7 +1323,7 @@ public class MeasurementActivity extends AppCompatActivity implements
             updateChartSeries(pH_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
         else
             updateChartSeries(t_valuesList,(SimpleXYSeries)calPlotSeries,calPlot);
-        Log.d(TAG, "updateDataSwClAlk: See if this function is being called");
+
         // update measurement charts, max sample size for meas plots = 1800
         // (30 mins @ 1Hz sampling),otherwise interface bogs down. Can be increased
         // if multi-threading is used or code is optimized
@@ -1365,9 +1358,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         int l = (maxLength < measList.size()) ? maxLength : measList.size();
 
         List<Double> values = new ArrayList<>();
-        Log.d(TAG, "getDoubleFromMeasList: measLIst" + measList.toString());
         for (int i = measList.size()-l; i < measList.size(); i++) {
-            Log.d(TAG, "getDoubleFromMeasList: item at index" + measList.get(i).getValue(valIndex) );
             values.add((Double)measList.get(i).getValue(valIndex));
         }
         return values;
@@ -1382,6 +1373,7 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     private void updateChartSeries(List<? extends Number> numbers, SimpleXYSeries series, XYPlot plot) {
         series.setModel(numbers, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY);
+
         plot.redraw();
     }
 
@@ -1645,8 +1637,9 @@ public class MeasurementActivity extends AppCompatActivity implements
                 "Alkalinity (ppm)",
                 "pH (mV)",
                 "Free Cl (nA)",
+                "Alkalinity (nA)",
                 "Interval Time",
-                "Free Cl Sw. On"
+                "Free Cl/Alk Sw. On"
         };
 
         //Additional stats column headers
@@ -1696,6 +1689,7 @@ public class MeasurementActivity extends AppCompatActivity implements
         //Calibration voltage
         headers[4] = "Calibration Voltage, Ecal [pH = 7] (mV): \t"+String.format(Locale.CANADA,"%.3f", phCalOffset);
         //Data column headers
+        // TODO: Organize these data headers better
         if(INCLUDE_STATS)
             headers[5] = ch[0]+'\t'+ch[1]+'\t'+ch[2]+'\t'+ch[3]+'\t'+ch[4]+'\t'+ch[5]+'\t'+ch[6]+'\t'+ch[7]+
                     sch[0]+'\t'+sch[1]+'\t'+sch[2]+'\t'+sch[3]+'\t'+sch[4]+'\t'+sch[5];

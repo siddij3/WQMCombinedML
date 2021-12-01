@@ -249,13 +249,13 @@ class MeasData {
         Log.d(TAG, String.format("calcCl: i: %.3f ph: %.3f t: %.2f",a,ph,t));
 
         k = 0.57;
-        f_a = a - Cl_Cal_i;
-        sf_t = Cl_Sens + (t-27) * 9.3;
+        f_a = a - Alk_Cal_i;
+        sf_t = Alk_Sens + (t-27) * 9.3;
         t2 = t + 273;
         f_t = (3000/t2)-10.0686+(0.0253*t2);
         f_ph_t = 1 + Math.pow(10,ph - f_t);
 
-        result = k*(f_a/sf_t)*f_ph_t + Cl_Cal_lvl;
+        result = k*(f_a/sf_t)*f_ph_t + Alk_Cal_lvl;
 
         //Set to zero if result is negative (ppm can not be negative)
         if (result < 0)
@@ -289,9 +289,6 @@ class MeasData {
     private double calcAlk(double a) {
         double k, f_a, result;
         Log.d(TAG, String.format("calcAlk: a: %.3f ", a));
-        //Cl_Cal_i = current offset, f_i = meas. current - Cl_Cal_i
-        //Cl_Cal_lvl = level (in ppm) when f_i is 0
-        //Cl_Sens = current / ppm slope
 
         k = 1.0;
         f_a = a - Alk_Cal_i;
