@@ -84,7 +84,8 @@ class MeasData {
         temperature = calcT(rawT);
         phValue = calcPh(rawE, temperature);
         chlorineValue = calcCl(rawI, phValue, temperature);
-        alkalinityValue = calcAlk(rawI, phValue, temperature);
+        alkalinityValue = calcAlk(rawA);
+        //alkalinityValue = calcAlk(rawI, phValue, temperature);
 
         timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.CANADA).format(new Date());
 
@@ -95,6 +96,7 @@ class MeasData {
     }
     //Meas data calculation currently used
     MeasData(double rawT, double rawE, double rawI, double rawA, double measTime, boolean swOn, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens, double Cl_Cal_i, double Cl_Cal_lvl, double Cl_Sens, double Alk_Cal_i, double Alk_Cal_lvl, double Alk_Sens){
+  //MeasData(           t,          e,           i,           a,            tMeas,s        wOn,   phCalOffset,    phCalSlopeLo,    phCalSlopeHi,   tCalOffset,   tCalSlope,      ClCalOffset,       ClCalLevel,ClCalSlope, alkCalOffset, alkCalLevel, alkCalSlope)
         this.rawT = rawT;
         this.rawE = rawE;
         this.rawI = rawI;
@@ -243,10 +245,10 @@ class MeasData {
         Log.d(TAG, String.format("calcCl: k: %.3f f_i: %.3f sf_t: %.3f f_t: %.3f f_ph_t: %.3f Cl: %.3f",k,f_i,sf_t,f_t,f_ph_t,result));
         return result;
     }
-
+/*
     private double calcAlk(double a, double ph, double t){
         double k, f_a, sf_t, f_ph_t, f_t, t2, result;
-        Log.d(TAG, String.format("calcCl: i: %.3f ph: %.3f t: %.2f",a,ph,t));
+        Log.d(TAG, String.format("calcAlk: i: %.3f ph: %.3f t: %.2f",a,ph,t));
 
         k = 0.57;
         f_a = a - Alk_Cal_i;
@@ -264,11 +266,10 @@ class MeasData {
         Log.d(TAG, String.format("calcCl: k: %.3f f_a: %.3f sf_t: %.3f f_t: %.3f f_ph_t: %.3f Cl: %.3f",k,f_a,sf_t,f_t,f_ph_t,result));
         return result;
     }
-
+*/
     //simplified free Cl calculation, does not consider pH level or temperate
     private double calcCl(double i){
         double k, f_i, result;
-        Log.d(TAG, String.format("calcCl: i: %.3f ",i));
         //Cl_Cal_i = current offset, f_i = meas. current - Cl_Cal_i
         //Cl_Cal_lvl = level (in ppm) when f_i is 0
         //Cl_Sens = current / ppm slope
@@ -276,30 +277,34 @@ class MeasData {
         k = 1.0;
         f_i = i - Cl_Cal_i;
 
+        Log.d(TAG, String.format("calcCl: Current: %.3f  OFFSET: %.3f",i, Cl_Cal_i));
+
         result = k*(f_i/Cl_Sens) + Cl_Cal_lvl;
 
         //Set to zero if result is negative (ppm can not be negative)
         if (result < 0)
             result = 0.0;
 
-        Log.d(TAG, String.format("calcCl: k: %.3f f_i: %.3f Cl: %.3f",k,f_i,result));
+        //Log.d(TAG, String.format("calcCl: k: %.3f f_i: %.3f Cl: %.3f",k,f_i,result));
+        //TODO
         return result;
     }
-
+    //simplified Alk calculation, does not consider pH level or temperate
     private double calcAlk(double a) {
         double k, f_a, result;
         Log.d(TAG, String.format("calcAlk: a: %.3f ", a));
-
+        Log.d(TAG, String.format("calcAlk: Offset: %.3f", Alk_Cal_i));
         k = 1.0;
         f_a = a - Alk_Cal_i;
 
         result = k*(f_a/Alk_Sens) + Alk_Cal_lvl;
 
+        Log.d(TAG, String.format("calcAlk: k: %.3f f_a: %.3f Alk: %.3f",k,f_a,result));
         //Set to zero if result is negative (ppm can not be negative)
         if (result < 0)
             result = 0.0;
 
-        Log.d(TAG, String.format("calcAlk: k: %.3f f_a: %.3f Alk: %.3f",k,f_a,result));
+
         return result;
     }
 

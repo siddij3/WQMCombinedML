@@ -70,7 +70,7 @@ public class MeasurementActivity extends AppCompatActivity implements
     private static final boolean INCLUDE_STATS = false;
 
     private static final double CL_MEAS_THRESHOLD = 70.0;
-    private static final double ALK_MEAS_THRESHOLD = 70.0; //TODO Find threshold for alkalinity
+    private static final double ALK_MEAS_THRESHOLD = 120;
 
 
     public static final int MAX_READ_LINE_LEN = 50; //Maximum expected size in chars per msg
@@ -904,20 +904,21 @@ public class MeasurementActivity extends AppCompatActivity implements
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
 
                 String s = new String(data);
-                Log.d(TAG, "onReceive: " + s);
+                //Log.d(TAG, "onReceive: " + data.toString());
 
                 //add data to form string, if NL encountered parse and update data
-                //TODO I believe i parse the data here and include the alkalinity sensor stuff
                 for (byte b:
                         data) {
                     if((char)b == '\n'){
                         if (sbRead.length() <= MAX_READ_LINE_LEN){
                             double[] d = new double[6];
+
                             if(parseDataSwClAlk(sbRead,d)) {
                                 readFails = 0;
                                 if (measuring)
-                                    d[3] = d[2];
-                                updateDataSwClAlk(d[0],d[1],d[2],d[3], d[4], d[5]>0.5);
+                                    //d[3] = d[2];
+                                    Log.d(TAG, "onReceive: " + d[0] + " " + d[1] + " " + d[2] + " " + d[3]);
+                                    updateDataSwClAlk(d[0],d[1],d[2],d[3], d[4], d[5]>0.5);
                             } else {
                                 //parse failed, if three consecutive fails prompt user
                                 readFails++;
@@ -1157,14 +1158,6 @@ public class MeasurementActivity extends AppCompatActivity implements
         for (int i = 0; i < dataPts; i++) {
             if (dataStrings[i].length()>0){
                 try {
-                    //TODO hot-wiring the alkalinity sensor data
-                    if (i == 3) {
-                        data[3] = data[2];
-                        data[4] = Double.parseDouble(dataStrings[3].toString());
-                        data[5] = Double.parseDouble(dataStrings[4].toString());
-                        Log.d(TAG, "parseDataSwClAlk: Received array as a string: " + Arrays.toString(data));
-                        break;
-                    }
                     data[i] = Double.parseDouble(dataStrings[i].toString());
                 } catch (Exception e){
                     Log.e(TAG, "parseData: Exception occurred: " +e.toString());
@@ -1202,9 +1195,9 @@ public class MeasurementActivity extends AppCompatActivity implements
         // (Used for calibration)
         // Also calculate stats over average period
       //  if(success){
-            averageCalVoltage_pH = avgValues[4];
-            averageCalVoltage_t = avgValues[5];
-            averageCalVoltageValid = true;
+        averageCalVoltage_pH = avgValues[4];
+        averageCalVoltage_t = avgValues[5];
+        averageCalVoltageValid = true;
         //} else {
           //  averageCalVoltage_pH = 0.0;
            // averageCalVoltage_t = 0.0;
@@ -1268,6 +1261,9 @@ public class MeasurementActivity extends AppCompatActivity implements
         double avgValues[] = new double[6];
         double pH_stats[] = new double[6];
         double t_stats[] = new double[6];
+
+        //TODO find alkalinity offset values
+        Log.d(TAG, String.format("updateDataSwClAlk: alk: %.3f", a ));
         MeasData m = new MeasData(t,e,i,a, tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope, alkCalOffset, alkCalLevel, alkCalSlope);
 
         measList.add(m);
@@ -1379,8 +1375,8 @@ public class MeasurementActivity extends AppCompatActivity implements
 
     private boolean refreshDisplayValues(boolean updateAvg, double[] avg, MeasData m) {
         try {
-            boolean CurrClValid = (double)m.getValue(MeasData.SW_TIME) > CL_MEAS_THRESHOLD;
-            boolean CurrAlkValid = (double)m.getValue(MeasData.SW_TIME) > ALK_MEAS_THRESHOLD;
+            boolean CurrClValid = true; //(double)m.getValue(MeasData.SW_TIME) > CL_MEAS_THRESHOLD;
+            boolean CurrAlkValid = true; //(double)m.getValue(MeasData.SW_TIME) > ALK_MEAS_THRESHOLD;
 
             if(CurrClValid){
                 ValidClRecorded = true;
@@ -1413,6 +1409,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                         tvCurrentVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) m.getValue(i)));
                         tvCurrentVals[i].setTextSize(24);
                         // TODO get the proper ppm values
+
                         if((double)m.getValue(i) >= 75 && (double)m.getValue(i) <= 238){
                             tvCurrentVals[i].setTextColor(Color.GREEN);
                         } else {
@@ -1456,7 +1453,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                         if (CurrAlkValid) {
                             tvAvgVals[i].setText(String.format(Locale.CANADA, "%.2f", (double) avg[i]));
                             tvAvgVals[i].setTextSize(24);
-                            if(avg[i] >= 0.1 && avg[i] <= 4.0){
+                            if(avg[i] >= 75 && avg[i] <= 238){
                                 tvAvgVals[i].setTextColor(Color.GREEN);
                             } else {
                                 tvAvgVals[i].setTextColor(Color.BLACK);

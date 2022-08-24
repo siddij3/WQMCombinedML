@@ -23,11 +23,11 @@ public class Prefs extends AppCompatActivity {
     public final static String DEF_TCALOFFSET = "0";
 
     public final static String DEF_CLCALSLOPE = "342.0";
-    public final static String DEF_CLCALOFFSET = "109.6";
+    public final static String DEF_CLCALOFFSET = "-109.6"; //TODO
     public final static String DEF_CLCALLEVEL = "0.0";
 
-    public final static String DEF_ALKCALSLOPE = "342.0";
-    public final static String DEF_ALKCALOFFSET = "109.6";
+    public final static String DEF_ALKCALSLOPE = "-169.0";
+    public final static String DEF_ALKCALOFFSET = "-67000"; //TODO
     public final static String DEF_ALKCALLEVEL = "0.0";
 
     //Preference keys for settings not available from UI
