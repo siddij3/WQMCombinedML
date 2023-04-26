@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion 32
+
     defaultConfig {
         applicationId 'ca.mcmaster.waterqualitymonitor'
-        minSdkVersion 21
-        targetSdkVersion 26
+        minSdkVersion 26
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -22,17 +22,19 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+//    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.androidplot:androidplot-core:1.5.1'
-    compile 'com.google.android.gms:play-services-location:11.6.0'
-    compile 'com.google.android.gms:play-services-drive:11.6.0'
-    compile 'com.google.android.gms:play-services-auth:11.6.0'
-    compile 'com.android.support:design:26.1.0'
-    compile 'org.apache.commons:commons-math3:3.6.1'
-    testCompile 'junit:junit:4.12'
+
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "com.androidplot:androidplot-core:1.5.9"
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation 'com.google.android.gms:play-services-drive:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    testImplementation 'junit:junit:4.13.2'
 }

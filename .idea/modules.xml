@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/WaterQualityMonitorCombined.iml" filepath="$PROJECT_DIR$/.idea/WaterQualityMonitorCombined.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/WaterQualityMonitorCombined.app.unitTest.iml" />
     </modules>
   </component>
 </project>

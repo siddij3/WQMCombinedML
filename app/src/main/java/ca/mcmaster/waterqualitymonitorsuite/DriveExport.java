@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import android.content.IntentSender;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -117,7 +117,7 @@ public class DriveExport extends Activity {
                 } else {
                     Log.d(TAG, "onActivityResult: File Created!");
                     Intent resultIntent = new Intent();
-                    resultIntent.putExtra(EXTRAS_DRIVE_ID,data.getParcelableExtra(OpenFileActivityOptions.EXTRA_RESPONSE_DRIVE_ID));
+                    resultIntent.putExtra(EXTRAS_DRIVE_ID, (Bundle) data.getParcelableExtra(OpenFileActivityOptions.EXTRA_RESPONSE_DRIVE_ID));
                     setResult(RESULT_CODE_SAVE_SUCCESS,resultIntent);
                     finish();
                 }

@@ -17,9 +17,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +36,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -55,6 +54,7 @@ import java.util.*;
 import ca.mcmaster.testsuitecommon.BluetoothLeService;
 import ca.mcmaster.testsuitecommon.DeviceScanActivity;
 import ca.mcmaster.testsuitecommon.GattAttributes;
+
 
 public class MeasurementActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
