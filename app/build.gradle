@@ -1,15 +1,35 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.chaquo.python'
 
 android {
-    compileSdkVersion 32
+    namespace 'ca.mcmaster.waterqualitymonitorsuite'
+
+    compileSdkVersion  33
 
     defaultConfig {
         applicationId 'ca.mcmaster.waterqualitymonitor'
-        minSdkVersion 26
-        targetSdkVersion 31
+        minSdkVersion 31
+
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+        python {
+            version "3.8"
+            pip {
+                install "numpy"
+                install "pandas"
+                install "tensorflow"
+                install "keras"
+                install "sklearn"
+                install "sqlalchemy"
+            }
+        }
+
+
     }
     buildTypes {
         release {
@@ -17,8 +37,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
-    }
+
 }
 
 dependencies {
