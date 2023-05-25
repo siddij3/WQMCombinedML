@@ -13,24 +13,32 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View;
 
-import android.location.Location;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.androidplot.xy.BoundaryMode;
+import com.androidplot.xy.LineAndPointFormatter;
+import com.androidplot.xy.SimpleXYSeries;
+import com.androidplot.xy.XYGraphWidget;
+import com.androidplot.xy.XYPlot;
+import com.androidplot.xy.XYSeries;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -40,20 +48,19 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.XYSeries;
-import com.androidplot.xy.*;
-
-import java.util.*;
+import java.util.Random;
 
 import ca.mcmaster.testsuitecommon.BluetoothLeService;
 import ca.mcmaster.testsuitecommon.DeviceScanActivity;
 import ca.mcmaster.testsuitecommon.GattAttributes;
+
+import com.chaquo.python.Python;
+import com.chaquo.python.PyObject;
 
 
 public class MeasurementActivity extends AppCompatActivity implements
@@ -233,6 +240,9 @@ public class MeasurementActivity extends AppCompatActivity implements
             alk = DEMO_ALK_I[seconds];
             //e = -50.0 + 0.02*(m*x+b) + 0.03*(rand.nextDouble()*2-1);
             //i = 500.0 + 0.04*(m*x+b) + 0.06*(rand.nextDouble()*2-1);
+
+            if (!Python.isStarted())
+                Python.start(new AndroidPlatform(context));
 
             updateDataSwClAlk(t, e,  i, alk, (double)seconds, seconds>50);
             timerHandler.postDelayed(this, 1000);
@@ -917,7 +927,7 @@ public class MeasurementActivity extends AppCompatActivity implements
                                 readFails = 0;
                                 if (measuring)
                                     //d[3] = d[2];
-                                    Log.d(TAG, "onReceive: " + d[0] + " " + d[1] + " " + d[2] + " " + d[3]);
+                                    //Log.d(TAG, "onReceive: " + d[0] + " " + d[1] + " " + d[2] + " " + d[3]);
                                     updateDataSwClAlk(d[0],d[1],d[2],d[3], d[4], d[5]>0.5);
                             } else {
                                 //parse failed, if three consecutive fails prompt user
@@ -1263,6 +1273,8 @@ public class MeasurementActivity extends AppCompatActivity implements
         double t_stats[] = new double[6];
 
         //TODO find alkalinity offset values
+        //TODO compile all 51 datapoints for Free chlorine, and send for transformation
+
         Log.d(TAG, String.format("updateDataSwClAlk: alk: %.3f", a ));
         MeasData m = new MeasData(t,e,i,a, tMeas,swOn,phCalOffset,phCalSlopeLo,phCalSlopeHi,tCalOffset,tCalSlope,ClCalOffset,ClCalLevel,ClCalSlope, alkCalOffset, alkCalLevel, alkCalSlope);
 
@@ -1272,8 +1284,7 @@ public class MeasurementActivity extends AppCompatActivity implements
             measList.remove(0);
         // calculate average values, return if averaging operation was successful
         success = calcAverages(avgValues, avgSampleSize);
-
-
+        
         // If averages updated successfully, update average voltage and status
         // (Used for calibration)
         // Also calculate stats over average period

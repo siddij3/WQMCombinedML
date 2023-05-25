@@ -67,13 +67,13 @@ def sql_to_pandas(table_name, engine):
         output = output.drop(["index"], axis = 1)
         # print(f"'index' parameter dropped {table_name}");
     except:
-    # print("'index' parameter does not exist");
+        # print("'index' parameter does not exist");
 
     try:
         output = output.drop(["level_0"], axis = 1)
         # print("'level_0' parameter dropped");
     except:
-    # print("'level_0' parameter does not exist");
+        # print("'level_0' parameter does not exist");
 
     return output
 

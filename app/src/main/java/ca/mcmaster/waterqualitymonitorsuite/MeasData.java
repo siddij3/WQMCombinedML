@@ -2,10 +2,12 @@ package ca.mcmaster.waterqualitymonitorsuite;
 
 import android.util.Log;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
 /**
  * Created by DK on 2017-10-28.
  */
@@ -57,6 +59,10 @@ class MeasData {
     private double pH_stats[];
     private double t_stats[];
 
+    private final Python py = Python.getInstance();
+
+    private PyObject backend;
+
     MeasData(double rawT, double rawE, double rawI, double rawA, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens){
         this.rawT = rawT;
         this.rawE = rawE;
@@ -93,6 +99,9 @@ class MeasData {
         avgOk = false;
         pH_stats = new double[5];
         t_stats = new double[5];
+
+        backend = py.getModule("backend");
+
     }
     //Meas data calculation currently used
     MeasData(double rawT, double rawE, double rawI, double rawA, double measTime, boolean swOn, double phCal7, double phSensLo, double phSensHi, double tCal, double tSens, double Cl_Cal_i, double Cl_Cal_lvl, double Cl_Sens, double Alk_Cal_i, double Alk_Cal_lvl, double Alk_Sens){
@@ -130,6 +139,10 @@ class MeasData {
         avgOk = false;
         pH_stats = new double[5];
         t_stats = new double[5];
+
+
+
+        backend = py.getModule("backend");
     }
 
     public void setpH_stats(double[] stats){
@@ -219,11 +232,47 @@ class MeasData {
         return result;
     }
 
-    /*Cl calculation from supplied, current, pH and temperature
-      broken up to simplify calculation, f_* = function of *
 
-      C = k*(f_i/sf_t)*f_ph_t
-      where f_ph_t = 1+10^(ph - f_t) */
+    static double f(double x) {
+        return Math.exp(- x * x / 2) / Math.sqrt(2 * Math.PI);
+    }
+
+    public double calcIntegral(double[] current, double[] t) {
+        int LONGEST_RANGE = 26;
+
+        double a, b;
+        double N = t[LONGEST_RANGE] - t[0];
+
+        // 18 chosen based on python code. See:
+        //https://github.com/siddij3/WQM_NN_modelling/blob/main/FC/tmp_code/Editing_data.py
+
+        double h = (t[LONGEST_RANGE] - t[0]) / N;              // step size
+        double sum = 0.5 * (current[0] + current[LONGEST_RANGE]);    // area
+
+
+        for (int i = 1; i < N; i++) {
+            int x = (int)t[0] + (int)h * i;
+            sum += current[x];
+        }
+
+        return sum * h;
+
+    }
+
+
+  /*Cl calculation from supplied, current, pH and temperature
+  broken up to simplify calculation, f_* = function of *
+
+  C = k*(f_i/sf_t)*f_ph_t
+  where f_ph_t = 1+10^(ph - f_t) */
+
+    private double predictCl() {
+
+        // double flcConc = Float.parseFloat(backend.)
+
+
+        return 1;
+    }
 
     private double calcCl(double i, double ph, double t){
         double k, f_i, sf_t, f_ph_t, f_t, t2, result;
