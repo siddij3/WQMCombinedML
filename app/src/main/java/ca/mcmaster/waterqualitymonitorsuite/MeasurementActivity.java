@@ -27,6 +27,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -37,10 +39,11 @@ import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
-import com.chaquo.python.Python;
-import com.chaquo.python.android.AndroidPlatform;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
@@ -59,13 +62,11 @@ import ca.mcmaster.testsuitecommon.BluetoothLeService;
 import ca.mcmaster.testsuitecommon.DeviceScanActivity;
 import ca.mcmaster.testsuitecommon.GattAttributes;
 
-import com.chaquo.python.Python;
-import com.chaquo.python.PyObject;
 
 
-public class MeasurementActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+
+public class MeasurementActivity extends AppCompatActivity
+        implements ConnectionCallbacks, OnConnectionFailedListener {
 
     private static final String TAG = MeasurementActivity.class.getSimpleName();
 
@@ -203,6 +204,8 @@ public class MeasurementActivity extends AppCompatActivity implements
     //Timer functionality, used only for demo mode to simulate samples
     long startTime = 0;
 
+
+
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
 
@@ -241,8 +244,9 @@ public class MeasurementActivity extends AppCompatActivity implements
             //e = -50.0 + 0.02*(m*x+b) + 0.03*(rand.nextDouble()*2-1);
             //i = 500.0 + 0.04*(m*x+b) + 0.06*(rand.nextDouble()*2-1);
 
-            if (!Python.isStarted())
-                Python.start(new AndroidPlatform(context));
+
+          //  if (!Python.isStarted())
+            //    Python.start(new AndroidPlatform(context));
 
             updateDataSwClAlk(t, e,  i, alk, (double)seconds, seconds>50);
             timerHandler.postDelayed(this, 1000);
@@ -573,26 +577,6 @@ public class MeasurementActivity extends AppCompatActivity implements
         startMeasuring(false);
         unbindService(serviceConnection);
         bluetoothLeService = null;
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-
-        Location l = getLastLoc();
-        if(l!=null){
-            double t = ((double)(System.currentTimeMillis() - l.getTime()))/1000.0;
-            Log.d(TAG, "onConnected: Location received:" + l.toString() + " , " + String.format(Locale.CANADA,"%.2f",t) + " seconds ago");
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i(TAG, "GoogleApiClient connection has been suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(TAG, "GoogleApiClient connection has failed");
     }
 
     private Location getLastLoc(){
@@ -1760,4 +1744,18 @@ public class MeasurementActivity extends AppCompatActivity implements
         return filename;
     }
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }
