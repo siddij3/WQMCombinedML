@@ -1,111 +1,80 @@
-import pandas as pd
+
+# ## Importing Data
+
+#
+# -*- coding: utf-8 -*-
+# Regression Example With Boston Dataset: Standardized and Wider
+import os
 import functions
 
-
-from sqlalchemy import create_engine
-from sqlalchemy import text
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
-
-import file_management
-
 from sklearn.preprocessing import StandardScaler
-from sklearn.utils import shuffle
+from keras.models import load_model
 
-def get_creds():
-    server = 'localhost'
-    database = 'wqm'
-    username = 'wqm_admin'
-    password = 'password'
-    port = 3306
+import pandas as pd
+from pandas import DataFrame
+import aws
+import file_management
+import sql_manager
 
-    con = f'mysql+pymysql://{username}:{password}@{server}/{database}'
-    return con
+from sql_manager import sql_to_pandas
 
-def connect():
-    engine = create_engine(
-        get_creds(),
-        pool_recycle=3600)
+from sql_manager import pandas_to_sql_if_exists
 
-    return engine
-
-def get_table_name():
-    return functions.get_table_name()
-
-def check_tables(engine, table):
-    isTable = False
-
-    query = text(f"SELECT * FROM {table}")
-
-    with engine.begin() as conn:
-        try:
-            result = conn.execute(query)
-        except:
-            return isTable
-
-    isTable = True
-    return result
-
-def remove_table(table, engine):
-    query = text(f"Drop table {table}")
-    with engine.begin() as conn:
-        try:
-            result = conn.execute(query)
-        except:
-            return False
+import re
+import tensorflow as tf
+import numpy as np
 
 
-def pandas_to_sql(table_name, pandas_dataset, engine):
-    pandas_dataset.to_sql(table_name, con=engine)
+def get_models():
+    global optimal_NNs, sensor_data
 
-def pandas_to_sql_if_exists(table_name, pandas_dataset, engine, action):
-    pandas_dataset.to_sql(table_name, con=engine, if_exists=action)
+    ## DATA IMPORTING AND HANDLING
+    engine = aws.connect()
+
+    # The dataset should be the 50 s array of time from the app
+    # TODO GET SENSOR DATA
+    sensor_data = "get from app"
+    table_name = sql_manager.get_table_name()
+    std_params = sql_to_pandas(sql_manager.get_params_table_name(), engine)
+
+    # GET FILE FROM S3 BUCKET, UNZIP IT,
+    path = file_management.get_file_path() #os.path.join(os.environ['HOME'], f'{folder_name}')
+    s3 = aws.s3_bucket()
+
+    # TODO train gold_fc_prod models without Rinse, and one without Temp/pH
+    aws.load_from_bucket(s3, path, table_name)
+
+    # Downloading files and such
+    k_folds = functions.get_num_folds()
+    local_download_path = os.path.join(os.environ['HOME'], f'{path}')
+
+    optimal_NNs = [None]*k_folds
+
+    i = 0
+    tmp = ""
+    for filename in os.listdir(local_download_path):
+
+        if "Model" in filename:
+            #optimal_NNs[i] = load_model(f"{path}\\{filename}")
+            # TODO there could be some bugs here
+            optimal_NNs[i] = load_model(os.path.join(os.environ['HOME'], f'{path}\\{filename}'))
 
 
-def sql_to_pandas(table_name, engine):
-    output = pd.read_sql_table(table_name, con=engine.connect())
-    try:
-        output = output.drop(["index"], axis = 1)
-        # print(f"'index' parameter dropped {table_name}");
-    except:
-    # print("'index' parameter does not exist");
-
-    try:
-        output = output.drop(["level_0"], axis = 1)
-        # print("'level_0' parameter dropped");
-    except:
-    # print("'level_0' parameter does not exist");
-
-    return output
+            #print(optimal_NNs[i].optimizer)
+            i+=1
 
 
 
-def get_vals(table, col, val, engine):
-    query = text(f"SELECT * FROM {table} where `{col}` = {val}")
-    return get_query_to_pandas(engine, query)
+def calculate_ppm():
 
-def get_two_vals(engine, table, col1, val1, col2, val2):
-    query = text(f"SELECT * FROM {table} where `{col1}` = {val1} and `{col2}` = {val2}")
-    return get_query_to_pandas(engine, query)
+    k_folds = functions.get_num_folds()
+    tmp_ppm = [None]*k_folds
+    for fold in range(k_folds):
+        tmp_ppm[fold] = functions.predict_ppm(optimal_NNs[fold], sensor_data)
 
-def get_query_to_pandas(engine, query):
-    with engine.begin() as conn:
-        result = conn.execute(query)
+    return sum(tmp_ppm)/k_folds
 
-    output = pd.DataFrame()
-    for r in result:
 
-        df_dictionary = pd.DataFrame([r._asdict()])
-        output = pd.concat([output, df_dictionary], ignore_index=True)
 
-    try:
-        output = output.drop(["index"], axis = 1)
-    except:
-        pass
 
-    try:
-        output = output.drop(["level_0"], axis = 1)
-    except:
-        pass
-
-    return output
 

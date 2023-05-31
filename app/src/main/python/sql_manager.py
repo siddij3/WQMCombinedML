@@ -4,32 +4,18 @@ import functions
 
 from sqlalchemy import create_engine
 from sqlalchemy import text
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
 
 import file_management
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import shuffle
 
-def get_creds():
-    server = 'localhost'
-    database = 'wqm'
-    username = 'wqm_admin'
-    password = 'password'
-    port = 3306
-
-    con = f'mysql+pymysql://{username}:{password}@{server}/{database}'
-    return con
-
-def connect():
-    engine = create_engine(
-        get_creds(),
-        pool_recycle=3600)
-
-    return engine
 
 def get_table_name():
     return functions.get_table_name()
+
+def get_params_table_name():
+    return functions.get_std_params_table_name()
 
 def check_tables(engine, table):
     isTable = False
@@ -52,7 +38,6 @@ def remove_table(table, engine):
             result = conn.execute(query)
         except:
             return False
-
 
 def pandas_to_sql(table_name, pandas_dataset, engine):
     pandas_dataset.to_sql(table_name, con=engine)
