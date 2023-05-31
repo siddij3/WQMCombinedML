@@ -10,6 +10,11 @@
       "StackName": "amplify-waterqualitymonitorc-dev-145218",
       "StackId": "arn:aws:cloudformation:us-east-1:199426559430:stack/amplify-waterqualitymonitorc-dev-145218/f0378590-fe51-11ed-885e-0ea35ce9628b",
       "AmplifyAppId": "dzn7umqe7k99z"
+    },
+    "categories": {
+      "api": {
+        "waterqualitymonitorc": {}
+      }
     }
   }
 }
