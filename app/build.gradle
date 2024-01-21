@@ -1,15 +1,47 @@
-apply plugin: 'com.android.application'
-
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.chaquo.python'
+}
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    namespace 'ca.mcmaster.waterqualitymonitorsuite'
+
+    compileSdkVersion  33
+
+    compileOptions {
+        // Support for Java 8 features
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId 'ca.mcmaster.waterqualitymonitor'
-        minSdkVersion 21
-        targetSdkVersion 26
+        minSdkVersion 31
+
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        ndk {
+            abiFilters "armeabi-v7a" //, "arm64-v8a", "x86", "x86_64"
+        }
+        python {
+            version "3.8"
+
+            pip {
+                install "numpy"
+                install "pandas"
+                install "tensorflow"
+                install "keras"
+                install "sklearn"
+                install "sqlalchemy"
+                install "boto3"
+                install "pymysql"
+            }
+        }
+
+
     }
     buildTypes {
         release {
@@ -17,22 +49,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
-    }
+
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+//    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.5.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.androidplot:androidplot-core:1.5.1'
-    compile 'com.google.android.gms:play-services-location:11.6.0'
-    compile 'com.google.android.gms:play-services-drive:11.6.0'
-    compile 'com.google.android.gms:play-services-auth:11.6.0'
-    compile 'com.android.support:design:26.1.0'
-    compile 'org.apache.commons:commons-math3:3.6.1'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.amplifyframework:core:1.4.0'
+    implementation 'com.amplifyframework:aws-auth-cognito:1.4.0'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.androidplot:androidplot-core:1.5.10'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-drive:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+
+    implementation 'mysql:mysql-connector-java:5.1.49'
+    testImplementation 'junit:junit:4.13.2'
 }

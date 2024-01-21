@@ -18,21 +18,27 @@ package ca.mcmaster.testsuitecommon;
 
 import android.Manifest;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import android.view.View;
 
+import com.amplifyframework.AmplifyException;
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.datastore.DataStorePlugin;
+
 import android.widget.Button;
 //import ca.mcmaster.waterqualitymonitorsuite.DeviceScanActivity;
 import ca.mcmaster.waterqualitymonitorsuite.R;
+import android.app.Application;
 
 /**
  * Start up activity, allows user to select experiment application to use
@@ -41,6 +47,8 @@ public class SplashActivity extends AppCompatActivity {
     private static final String TAG = SplashActivity.class.getSimpleName();
 
     private static final int PERMISSION_RESPONSE = 2;
+
+    private Application mActivityAmplifyAWS;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +87,12 @@ public class SplashActivity extends AppCompatActivity {
 
         }
 
+        try {
+            Amplify.configure(getApplicationContext());
+            Log.i("MyAmplifyApp", "Initialized Amplify");
+        } catch (AmplifyException error) {
+            Log.e("MyAmplifyApp", "Could not initialize Amplify", error);
+        }
         Button btnLaunchWQM = (Button) findViewById(R.id.btnLaunchWQM);
         btnLaunchWQM.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -3,10 +3,11 @@ package ca.mcmaster.waterqualitymonitorsuite;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+
 
 /**
  * Created by DK on 2017-10-31.
@@ -21,9 +22,14 @@ public class Prefs extends AppCompatActivity {
     public final static String DEF_PHCALSLOPE = "60.6";
     public final static String DEF_TCALSLOPE = "100";
     public final static String DEF_TCALOFFSET = "0";
+
     public final static String DEF_CLCALSLOPE = "342.0";
-    public final static String DEF_CLCALOFFSET = "109.6";
+    public final static String DEF_CLCALOFFSET = "-109.6"; //TODO
     public final static String DEF_CLCALLEVEL = "0.0";
+
+    public final static String DEF_ALKCALSLOPE = "-169.0";
+    public final static String DEF_ALKCALOFFSET = "-67000"; //TODO
+    public final static String DEF_ALKCALLEVEL = "0.0";
 
     //Preference keys for settings not available from UI
     public final static String PREF_T100_VAL = "pref_cal_t100"; //preference key for storing T=100 voltage

@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-waterqualitymonitorc-dev-145218-authRole",
+      "UnauthRoleArn": "arn:aws:iam::199426559430:role/amplify-waterqualitymonitorc-dev-145218-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::199426559430:role/amplify-waterqualitymonitorc-dev-145218-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-waterqualitymonitorc-dev-145218-deployment",
+      "UnauthRoleName": "amplify-waterqualitymonitorc-dev-145218-unauthRole",
+      "StackName": "amplify-waterqualitymonitorc-dev-145218",
+      "StackId": "arn:aws:cloudformation:us-east-1:199426559430:stack/amplify-waterqualitymonitorc-dev-145218/f0378590-fe51-11ed-885e-0ea35ce9628b",
+      "AmplifyAppId": "dzn7umqe7k99z"
+    },
+    "categories": {
+      "api": {
+        "waterqualitymonitorc": {}
+      }
+    }
+  }
+}
