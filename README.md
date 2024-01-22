@@ -20,3 +20,11 @@ Chapquopy was used to interface Python APIs with the app such as the API for a c
 
 ![image](https://github.com/siddij3/WQMCombinedML/assets/16713437/1978cd74-2a0f-49cb-9897-6ae9f9db5a9a)
 
+## How are these inter-connected in the app?
+
+Once the app starts, it connects to a storage bucket on Cloudinary to download neural network models.
+If the sensor is connecting and while it's sensing the compounds, after 26 s the parameters will be organized into their relevant features at a sampling rate of 0.1 Hz, and calculating the integral of the signals.
+
+After the 26 s, the model calculates the analyte concentration and uploads the new data into the GCP server.
+
+![image](https://github.com/siddij3/WQMCombinedML/assets/16713437/64cd18d2-6b76-4ee4-9209-c33ea6715eca)
